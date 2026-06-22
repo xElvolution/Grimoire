@@ -1,0 +1,38 @@
+# ---- dependencies ----
+**/node_modules/
+.pnp
+.pnp.*
+
+# ---- next.js / build output ----
+**/.next/
+**/out/
+**/build/
+**/dist/
+**/*.tsbuildinfo
+**/next-env.d.ts
+
+# ---- env & secrets (NEVER commit private keys) ----
+**/.env
+**/.env.local
+**/.env.*.local
+**/.env.development
+**/.env.production
+
+# ---- third-party reference repos (cloned for SDK reference, not our code) ----
+_ref/
+
+# ---- deploy / tooling ----
+.vercel
+**/*.log
+npm-debug.log*
+yarn-debug.log*
+
+# ---- ai assistant scaffolding (not project code) ----
+**/CLAUDE.md
+**/AGENTS.md
+
+# ---- os / editor ----
+.DS_Store
+*.pem
+.idea/
+.vscode/
