@@ -36,3 +36,6 @@ yarn-debug.log*
 *.pem
 .idea/
 .vscode/
+
+# local economy store
+**/.data/

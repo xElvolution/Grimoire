@@ -1,65 +1,229 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useCallback, useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { fetchState, runSkill, type GrimoireState } from "@/lib/client";
+import QuestComposer from "@/components/app/QuestComposer";
+import SkillCard from "@/components/app/SkillCard";
+import RoyaltyFeed from "@/components/app/RoyaltyFeed";
+import Counter from "@/components/app/Counter";
+
+export default function AppPage() {
+  const [state, setState] = useState<GrimoireState | null>(null);
+  const [castingId, setCastingId] = useState<string | null>(null);
+  const [flash, setFlash] = useState<string | null>(null);
+
+  const refresh = useCallback(async () => {
+    try {
+      setState(await fetchState());
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  const onCast = useCallback(
+    async (id: string) => {
+      if (!state) return;
+      // a DIFFERENT agent casts the skill — rotate through the roster
+      const pool = state.agents;
+      const agent = pool[Math.floor(Math.random() * pool.length)];
+      setCastingId(id);
+      try {
+        const res = await runSkill(id, agent.id);
+        if (res.royalty) {
+          setFlash(
+            `${agent.name} cast "${res.royalty.skillName}" → +${res.royalty.amount} 0G to ${res.royalty.to}${
+              res.result.verified ? " · ✓ TEE" : ""
+            }`
+          );
+          setTimeout(() => setFlash(null), 3500);
+        }
+        await refresh();
+      } catch {
+        /* ignore */
+      } finally {
+        setCastingId(null);
+      }
+    },
+    [state, refresh]
+  );
+
+  const creator = state?.creator;
+  const stats = state?.stats;
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen bg-runic-grid">
+      {/* header */}
+      <header className="sticky top-0 z-40 border-b hairline bg-void/70 backdrop-blur-xl">
+        <div className="mx-auto max-w-7xl px-6 py-3 flex items-center justify-between">
+          <a href="/" className="flex items-center gap-2.5">
+            <span className="grid h-8 w-8 place-items-center rounded-lg glass glow-arcane">
+              <span className="font-display text-ember-bright">✦</span>
+            </span>
+            <span className="font-display text-xl text-parchment">Grimoire</span>
+          </a>
+
+          <div className="flex items-center gap-3">
+            <StatPill label="Level" value={creator ? String(creator.level) : "—"} />
+            <StatPill label="XP" value={creator ? String(creator.xp) : "—"} />
+            <div className="rounded-lg glass px-3 py-1.5 text-right">
+              <div className="font-mono text-sm text-ember-bright">
+                {creator ? (
+                  <Counter value={creator.earnings} decimals={3} suffix=" 0G" />
+                ) : (
+                  "—"
+                )}
+              </div>
+              <div className="text-[10px] text-ash">your earnings</div>
+            </div>
+            <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full glass px-3 py-1.5 text-[11px] text-ash">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald animate-pulse" />
+              0G Galileo Testnet
+            </span>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </header>
+
+      {/* flash toast */}
+      {flash && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="fixed top-20 left-1/2 z-50 -translate-x-1/2 rounded-xl glass glow-ember px-5 py-3 text-sm text-parchment"
+        >
+          {flash}
+        </motion.div>
+      )}
+
+      <main className="mx-auto max-w-7xl px-6 py-8">
+        {/* economy stat strip */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <EconStat label="Skills minted" value={stats?.totalSkills ?? 0} />
+          <EconStat label="Total casts" value={stats?.totalUses ?? 0} />
+          <EconStat
+            label="Royalties paid"
+            value={stats?.totalEarnings ?? 0}
+            decimals={3}
+            suffix=" 0G"
+            accent
+          />
+          <EconStat
+            label="Verified share"
+            value={(stats?.verifiedShare ?? 0) * 100}
+            suffix="%"
+          />
+        </div>
+
+        <div className="mt-8 grid gap-6 lg:grid-cols-3">
+          {/* left: composer + skills */}
+          <div className="lg:col-span-2 space-y-6">
+            {state && <QuestComposer agents={state.agents} onSolved={refresh} />}
+
+            <div>
+              <div className="flex items-center justify-between">
+                <h2 className="font-display text-xl text-parchment">The Grimoire</h2>
+                <span className="text-xs text-ash">
+                  {state?.skills.length ?? 0} skills · cast any to pay its creator
+                </span>
+              </div>
+              <div className="mt-4 grid sm:grid-cols-2 gap-4">
+                {state?.skills.length === 0 && (
+                  <div className="sm:col-span-2 rounded-2xl glass p-10 text-center text-sm text-ash">
+                    No skills yet. Post a task above — the agent that solves it
+                    mints your first skill.
+                  </div>
+                )}
+                {state?.skills.map((s) => (
+                  <SkillCard
+                    key={s.id}
+                    skill={s}
+                    onCast={onCast}
+                    casting={castingId === s.id}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* right: feed + agents */}
+          <div className="space-y-6">
+            {state && <RoyaltyFeed events={state.royalties} />}
+
+            <div className="rounded-2xl glass p-5">
+              <h3 className="font-display text-lg text-parchment">Agents</h3>
+              <p className="text-[11px] text-ash mb-3">
+                ERC-7857 identities · earn XP per cast
+              </p>
+              <div className="space-y-2">
+                {state?.agents
+                  .slice()
+                  .sort((a, b) => b.xp - a.xp)
+                  .map((a, i) => (
+                    <div
+                      key={a.id}
+                      className="flex items-center justify-between rounded-lg bg-void/40 border border-white/5 px-3 py-2"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-ash/50 text-xs w-4">{i + 1}</span>
+                        <span className="text-lg">{a.avatar}</span>
+                        <div>
+                          <div className="text-sm text-parchment">{a.name}</div>
+                          <div className="font-mono text-[10px] text-ash/60">
+                            {a.erc7857}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-xs text-arcane-bright">Lv {a.level}</div>
+                        <div className="text-[10px] text-ash">
+                          {a.questsSolved} casts · ★{a.reputation}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </div>
         </div>
       </main>
+    </div>
+  );
+}
+
+function StatPill({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="hidden sm:block rounded-lg glass px-3 py-1.5 text-right">
+      <div className="font-mono text-sm text-parchment">{value}</div>
+      <div className="text-[10px] text-ash">{label}</div>
+    </div>
+  );
+}
+
+function EconStat({
+  label,
+  value,
+  decimals = 0,
+  suffix = "",
+  accent = false,
+}: {
+  label: string;
+  value: number;
+  decimals?: number;
+  suffix?: string;
+  accent?: boolean;
+}) {
+  return (
+    <div className="rounded-2xl glass p-5">
+      <div
+        className={`font-display text-3xl ${accent ? "text-ember-bright" : "text-parchment"}`}
+      >
+        <Counter value={value} decimals={decimals} suffix={suffix} />
+      </div>
+      <div className="mt-1 text-xs text-ash">{label}</div>
     </div>
   );
 }
