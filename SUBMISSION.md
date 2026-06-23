@@ -44,7 +44,7 @@ Running on **0G Galileo testnet** with a real funded wallet:
 - **Real 0G Storage** — every skill and memory writes a real permanent root hash.
 - **Real on-chain royalty** — e.g. [`0xe38f3130…d41935`](https://chainscan-galileo.0g.ai/tx/0xe38f31300a43dc43ae45de724d663e1ecbe3d24694610abd89a77b2977d41935).
 
-**Contracts deployed + on-chain tested** (see `contracts/deployments.json`):
+**Contracts deployed, on-chain tested, and source-verified** on the 0G explorer (see `contracts/deployments.json`):
 
 | Contract | Address |
 | --- | --- |
