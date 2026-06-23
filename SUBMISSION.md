@@ -38,6 +38,23 @@ A working full-stack product, not a mockup:
   compute). When the wallet is funded, runs live on Galileo testnet with TEE verification;
   otherwise falls back to a clearly-labeled simulation so the loop is always demoable.
 
+## Live & verified on 0G (not simulated)
+Running on **0G Galileo testnet** with a real funded wallet:
+- **Real TEE inference** — model `qwen/qwen2.5-omni-7b` on a verified 0G Compute provider; responses come back `verified: true`.
+- **Real 0G Storage** — every skill and memory writes a real permanent root hash.
+- **Real on-chain royalty** — e.g. [`0xe38f3130…d41935`](https://chainscan-galileo.0g.ai/tx/0xe38f31300a43dc43ae45de724d663e1ecbe3d24694610abd89a77b2977d41935).
+
+**Contracts deployed + on-chain tested** (see `contracts/deployments.json`):
+
+| Contract | Address |
+| --- | --- |
+| SkillRegistry | [`0xC98a9AA31AFb146878bc7E49Be70127Acd9779cf`](https://chainscan-galileo.0g.ai/address/0xC98a9AA31AFb146878bc7E49Be70127Acd9779cf) |
+| AgentRegistry | [`0xC6ff2332670391648A4605B5bC7A9b66aF162E41`](https://chainscan-galileo.0g.ai/address/0xC6ff2332670391648A4605B5bC7A9b66aF162E41) |
+| RoyaltyVault | [`0x19E42df6B7e16BefD245Ed32697044D6f09723f4`](https://chainscan-galileo.0g.ai/address/0x19E42df6B7e16BefD245Ed32697044D6f09723f4) |
+| MemoryRegistry | [`0xe44820a409c3522665f4AE515CDDF30C09a43a64`](https://chainscan-galileo.0g.ai/address/0xe44820a409c3522665f4AE515CDDF30C09a43a64) |
+| SkillMarketplace | [`0x4e69d7566F434bD1D1a6d0eB9965D0062531467b`](https://chainscan-galileo.0g.ai/address/0x4e69d7566F434bD1D1a6d0eB9965D0062531467b) |
+| GrimToken ($GRIM) | [`0xFC25097421AbD4d422f895671cEfC033F5AAAA8E`](https://chainscan-galileo.0g.ai/address/0xFC25097421AbD4d422f895671cEfC033F5AAAA8E) |
+
 ## 60-second demo script
 1. Open the app. Point at the empty Grimoire and the economy stats at zero.
 2. **Post a task** ("Summarize the top 3 risks in a DeFi lending protocol"). Watch the
