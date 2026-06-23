@@ -21,6 +21,11 @@ import { ethers } from "ethers";
 import { createZGComputeNetworkBroker } from "@0glabs/0g-serving-broker";
 import { ZEROG, getPrivateKey } from "./config";
 
+// Funding amounts (0G). Providers require a 1.0 0G minimum reserve per sub-account,
+// so we keep a little headroom in the ledger main account above that.
+const LEDGER_FUND = Number(process.env.ZG_LEDGER_FUND || 1.2);
+const PROVIDER_RESERVE = process.env.ZG_PROVIDER_RESERVE || "1.0";
+
 export type InferenceResult = {
   answer: string;
   model: string;
@@ -76,9 +81,15 @@ async function ensureDeposit(broker: Broker) {
   if (deposited) return;
   try {
     const ledger = await broker.ledger.getLedger().catch(() => null);
-    const available = ledger ? BigInt(ledger[2] ?? 0) : 0n;
-    if (available < ethers.parseEther("0.02")) {
-      await broker.ledger.depositFund(0.05); // 0G (number)
+    // 0G Compute providers require a 1.0 0G minimum reserve locked per provider,
+    // so the ledger main account must hold at least that before we can transfer it.
+    if (!ledger) {
+      await broker.ledger.addLedger(LEDGER_FUND); // 0G (number)
+    } else {
+      const available = BigInt(ledger[2] ?? 0);
+      if (available < ethers.parseEther("1.0")) {
+        await broker.ledger.depositFund(LEDGER_FUND); // 0G (number)
+      }
     }
     deposited = true;
   } catch (e) {
@@ -109,7 +120,7 @@ async function ensureProviderReady(broker: Broker, provider: string) {
       await broker.ledger.transferFund(
         provider,
         "inference",
-        ethers.parseEther("0.01")
+        ethers.parseEther(PROVIDER_RESERVE)
       );
     } catch {
       /* already funded / sub-account exists */

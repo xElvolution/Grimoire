@@ -39,3 +39,8 @@ yarn-debug.log*
 
 # local economy store
 **/.data/
+
+# foundry
+contracts/out/
+contracts/cache/
+contracts/broadcast/

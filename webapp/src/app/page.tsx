@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { fetchState, runSkill, type GrimoireState } from "@/lib/client";
+import Nav from "@/components/app/Nav";
 import QuestComposer from "@/components/app/QuestComposer";
 import SkillCard from "@/components/app/SkillCard";
 import RoyaltyFeed from "@/components/app/RoyaltyFeed";
@@ -58,16 +59,9 @@ export default function AppPage() {
   return (
     <div className="min-h-screen bg-runic-grid">
       {/* header */}
-      <header className="sticky top-0 z-40 border-b hairline bg-void/70 backdrop-blur-xl">
-        <div className="mx-auto max-w-7xl px-6 py-3 flex items-center justify-between">
-          <a href="/" className="flex items-center gap-2.5">
-            <span className="grid h-8 w-8 place-items-center rounded-lg glass glow-arcane">
-              <span className="font-display text-ember-bright">✦</span>
-            </span>
-            <span className="font-display text-xl text-parchment">Grimoire</span>
-          </a>
-
-          <div className="flex items-center gap-3">
+      <Nav
+        right={
+          <div className="flex items-center gap-2 sm:gap-3">
             <StatPill label="Level" value={creator ? String(creator.level) : "—"} />
             <StatPill label="XP" value={creator ? String(creator.xp) : "—"} />
             <div className="rounded-lg glass px-3 py-1.5 text-right">
@@ -80,26 +74,22 @@ export default function AppPage() {
               </div>
               <div className="text-[10px] text-ash">your earnings</div>
             </div>
-            <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full glass px-3 py-1.5 text-[11px] text-ash">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald animate-pulse" />
-              0G Galileo Testnet
-            </span>
           </div>
-        </div>
-      </header>
+        }
+      />
 
       {/* flash toast */}
       {flash && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="fixed top-20 left-1/2 z-50 -translate-x-1/2 rounded-xl glass glow-ember px-5 py-3 text-sm text-parchment"
+          className="fixed top-20 left-1/2 z-50 -translate-x-1/2 max-w-[92vw] rounded-xl glass glow-ember px-5 py-3 text-center text-sm text-parchment"
         >
           {flash}
         </motion.div>
       )}
 
-      <main className="mx-auto max-w-7xl px-6 py-8">
+      <main className="mx-auto max-w-7xl px-4 sm:px-6 py-8">
         {/* economy stat strip */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <EconStat label="Skills minted" value={stats?.totalSkills ?? 0} />
@@ -171,9 +161,19 @@ export default function AppPage() {
                         <span className="text-ash/50 text-xs w-4">{i + 1}</span>
                         <span className="text-lg">{a.avatar}</span>
                         <div>
-                          <div className="text-sm text-parchment">{a.name}</div>
+                          <div className="flex items-center gap-1.5 text-sm text-parchment">
+                            {a.name}
+                            {a.spawnedBy && (
+                              <span
+                                title={`spawned by ${a.spawnedBy}`}
+                                className="rounded-full bg-mana/10 text-mana text-[9px] px-1.5 py-0.5"
+                              >
+                                spawned
+                              </span>
+                            )}
+                          </div>
                           <div className="font-mono text-[10px] text-ash/60">
-                            {a.erc7857}
+                            {a.specialty} · {a.erc7857}
                           </div>
                         </div>
                       </div>
@@ -219,7 +219,7 @@ function EconStat({
   return (
     <div className="rounded-2xl glass p-5">
       <div
-        className={`font-display text-3xl ${accent ? "text-ember-bright" : "text-parchment"}`}
+        className={`font-display text-2xl sm:text-3xl ${accent ? "text-ember-bright" : "text-parchment"}`}
       >
         <Counter value={value} decimals={decimals} suffix={suffix} />
       </div>

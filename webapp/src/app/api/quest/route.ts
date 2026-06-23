@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
   const prompt: string = body.prompt;
   const bounty = Number(body.bounty) || 0;
   const creator: string = body.creator || "you";
-  const agentId: string = body.agentId || "arden";
+  const requestedAgent: string = body.agentId || "auto";
 
   if (!prompt || typeof prompt !== "string" || prompt.trim().length < 4) {
     return NextResponse.json({ error: "A task description is required." }, { status: 400 });
@@ -29,6 +29,29 @@ export async function POST(req: NextRequest) {
   const result = await solve(prompt);
 
   const { key: category } = categorize(prompt);
+
+  // Orchestrator routing: use the specialist for this domain — or SPAWN a new
+  // agent (mint a fresh ERC-7857 identity) when no agent covers it yet.
+  let agentId = requestedAgent;
+  let spawnedAgent: { id: string; name: string; specialty: string; erc7857: string; by?: string } | null = null;
+  if (requestedAgent === "auto") {
+    const existing = db.agentForCategory(category);
+    if (existing) {
+      agentId = existing.id;
+    } else {
+      const by = db.topAgent();
+      const fresh = db.spawnAgent(category, by?.id);
+      agentId = fresh.id;
+      spawnedAgent = {
+        id: fresh.id,
+        name: fresh.name,
+        specialty: fresh.specialty,
+        erc7857: fresh.erc7857,
+        by: by?.name,
+      };
+    }
+  }
+
   const rarity = rarityFor(prompt, result.verified);
   const createdAt = Date.now();
 
@@ -112,6 +135,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     quest,
     skill,
+    spawnedAgent,
     simulated: result.simulated,
     note: result.note,
   });

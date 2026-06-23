@@ -28,7 +28,7 @@ export default function QuestComposer({
   onSolved: () => void;
 }) {
   const [prompt, setPrompt] = useState("");
-  const [agentId, setAgentId] = useState(agents[0]?.id ?? "arden");
+  const [agentId, setAgentId] = useState("auto");
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(0);
   const [result, setResult] = useState<QuestResponse | null>(null);
@@ -85,7 +85,7 @@ export default function QuestComposer({
         ))}
       </div>
 
-      <div className="mt-4 flex items-center justify-between gap-3">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
         <label className="flex items-center gap-2 text-xs text-ash">
           Agent
           <select
@@ -93,9 +93,10 @@ export default function QuestComposer({
             onChange={(e) => setAgentId(e.target.value)}
             className="rounded-lg border border-white/10 bg-void/60 px-2 py-1.5 text-parchment outline-none"
           >
+            <option value="auto">✨ Auto — orchestrator routes / spawns</option>
             {agents.map((a) => (
               <option key={a.id} value={a.id}>
-                {a.avatar} {a.name} · Lv{a.level}
+                {a.avatar} {a.name} · {a.specialty} · Lv{a.level}
               </option>
             ))}
           </select>
@@ -157,6 +158,19 @@ export default function QuestComposer({
                 </span>
               )}
             </div>
+            {result.spawnedAgent && (
+              <div className="mt-3 rounded-lg border border-mana/30 bg-mana/5 px-3 py-2 text-xs">
+                <span className="text-mana">⌬ New agent spawned</span>{" "}
+                <span className="text-parchment">
+                  {result.spawnedAgent.by ?? "Orchestrator"} minted{" "}
+                  <span className="font-medium">{result.spawnedAgent.name}</span> — a{" "}
+                  {result.spawnedAgent.specialty} specialist.
+                </span>
+                <div className="mt-0.5 font-mono text-[10px] text-mana/70">
+                  ERC-7857 {result.spawnedAgent.erc7857}
+                </div>
+              </div>
+            )}
             <p className="mt-2 text-xs text-ash line-clamp-3">{result.skill.sampleOutput}</p>
             <div className="mt-3 flex items-center justify-between text-[11px] text-ash/70 font-mono">
               <span>0G Storage: {result.quest.rootHash?.slice(0, 14)}…</span>

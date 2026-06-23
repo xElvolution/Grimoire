@@ -20,6 +20,8 @@ export type Skill = {
   royaltyPerUse: number;
   createdAt: number;
   txHash?: string; // 0G Storage tx
+  forSale?: boolean;
+  price?: number; // listing price in 0G
 };
 
 export type Quest = {
@@ -42,11 +44,14 @@ export type Agent = {
   id: string;
   name: string;
   erc7857: string; // Agentic ID
+  specialty: string; // the category this agent is expert in
   level: number;
   xp: number;
   reputation: number;
   questsSolved: number;
   avatar: string; // emoji/glyph
+  spawnedBy?: string; // name of the agent that minted this one
+  createdAt?: number;
 };
 
 export type Creator = {
@@ -56,6 +61,17 @@ export type Creator = {
   level: number;
   earnings: number;
   skillsCreated: number;
+};
+
+export type Memory = {
+  id: string; // 0G Storage root hash
+  agentId: string; // owning agent
+  label: string;
+  content: string;
+  createdAt: number;
+  txHash?: string;
+  verified: boolean; // stored on real 0G (vs local)
+  grantedTo: string[]; // agent ids with read access
 };
 
 export type RoyaltyEvent = {
