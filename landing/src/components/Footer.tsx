@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import LogoMark from "./LogoMark";
 
 const columns: { title: string; links: { label: string; href: string }[] }[] = [
   {
@@ -67,9 +68,7 @@ export default function Footer() {
         <div className="grid gap-12 lg:grid-cols-12">
           <div className="lg:col-span-5">
             <div className="flex items-center gap-2.5">
-              <span className="grid h-9 w-9 place-items-center rounded-lg glass glow-arcane">
-                <span className="font-display text-ember-bright">✦</span>
-              </span>
+              <LogoMark size={36} />
               <span className="font-display text-2xl text-parchment">Grimoire</span>
             </div>
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-ash">

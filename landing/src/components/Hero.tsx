@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { motion, type Variants } from "framer-motion";
+import { APP_URL } from "@/lib/links";
 
 // 3D canvas is client-only; skip SSR to avoid hydration cost
 const AgentNetwork = dynamic(() => import("./AgentNetwork"), { ssr: false });
@@ -67,7 +68,9 @@ export default function Hero() {
           className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
         >
           <a
-            href="#cta"
+            href={APP_URL}
+            target="_blank"
+            rel="noreferrer"
             className="group relative rounded-xl px-7 py-3.5 font-medium text-void bg-gradient-to-r from-ember-bright to-ember glow-ember hover:scale-[1.03] transition will-change-transform"
           >
             Create your first skill

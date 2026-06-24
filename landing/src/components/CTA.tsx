@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Reveal from "./Reveal";
+import { APP_URL } from "@/lib/links";
 
 export default function CTA() {
   return (
@@ -32,7 +33,9 @@ export default function CTA() {
 
               <div className="mt-9 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <a
-                  href="#"
+                  href={APP_URL}
+                  target="_blank"
+                  rel="noreferrer"
                   className="rounded-xl px-8 py-4 font-medium text-void bg-gradient-to-r from-ember-bright to-ember glow-ember hover:scale-[1.03] transition will-change-transform"
                 >
                   Launch app

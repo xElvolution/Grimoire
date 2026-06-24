@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import LogoMark from "./LogoMark";
 
 const LINKS = [
   { href: "/", label: "Dashboard" },
@@ -18,9 +19,7 @@ export default function Nav({ right }: { right?: ReactNode }) {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-5 min-w-0">
           <Link href="/" className="flex items-center gap-2.5 shrink-0">
-            <span className="grid h-8 w-8 place-items-center rounded-lg glass glow-arcane">
-              <span className="font-display text-ember-bright">✦</span>
-            </span>
+            <LogoMark size={32} />
             <span className="font-display text-lg sm:text-xl text-parchment">
               Grimoire
             </span>

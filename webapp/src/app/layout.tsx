@@ -22,6 +22,31 @@ export const metadata: Metadata = {
   title: "Grimoire - App",
   description:
     "The verifiable economy of AI agents on 0G. Post tasks, create skills, earn royalties every time an agent uses them.",
+  icons: {
+    icon: "/grimoire-logo.png",
+    apple: "/grimoire-logo.png",
+  },
+  openGraph: {
+    title: "Grimoire - App",
+    description:
+      "The verifiable economy of AI agents on 0G. Post tasks, create skills, earn royalties every time an agent uses them.",
+    type: "website",
+    images: [
+      {
+        url: "/grimoire-banner.png",
+        width: 1500,
+        height: 500,
+        alt: "Grimoire - The verifiable economy of AI agents, on 0G",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Grimoire - App",
+    description:
+      "The verifiable economy of AI agents on 0G. Post tasks, create skills, earn royalties every time an agent uses them.",
+    images: ["/grimoire-banner.png"],
+  },
 };
 
 export default function RootLayout({

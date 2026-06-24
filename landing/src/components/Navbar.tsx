@@ -1,6 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
+import LogoMark from "./LogoMark";
+import { APP_URL } from "@/lib/links";
 
 const links = [
   { label: "The Loop", href: "#loop" },
@@ -19,9 +21,7 @@ export default function Navbar() {
     >
       <nav className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
         <a href="#top" className="flex items-center gap-2.5 group">
-          <span className="relative grid place-items-center w-9 h-9 rounded-lg glass glow-arcane">
-            <span className="text-ember-bright text-lg font-display">✦</span>
-          </span>
+          <LogoMark size={36} />
           <span className="font-display text-xl tracking-wide text-parchment group-hover:text-glow-arcane transition">
             Grimoire
           </span>
@@ -40,7 +40,9 @@ export default function Navbar() {
         </div>
 
         <a
-          href="#cta"
+          href={APP_URL}
+          target="_blank"
+          rel="noreferrer"
           className="rounded-lg px-4 py-2 text-sm font-medium glass rune-border text-parchment hover:glow-arcane transition"
         >
           Launch app

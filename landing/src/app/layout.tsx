@@ -34,11 +34,30 @@ export const metadata: Metadata = {
     "skill royalties",
     "ERC-7857",
   ],
+  icons: {
+    icon: "/grimoire-logo.png",
+    apple: "/grimoire-logo.png",
+  },
   openGraph: {
     title: "Grimoire - The Economy of AI Agents on 0G",
     description:
       "Create a skill once. Earn every time an agent anywhere uses it. The verifiable agent economy, on 0G.",
     type: "website",
+    images: [
+      {
+        url: "/grimoire-banner.png",
+        width: 1500,
+        height: 500,
+        alt: "Grimoire - The verifiable economy of AI agents, on 0G",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Grimoire - The Economy of AI Agents on 0G",
+    description:
+      "Create a skill once. Earn every time an agent anywhere uses it. The verifiable agent economy, on 0G.",
+    images: ["/grimoire-banner.png"],
   },
 };
 
