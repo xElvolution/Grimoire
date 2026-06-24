@@ -64,9 +64,9 @@ export default function MemoryPage() {
     <div className="min-h-screen bg-runic-grid">
       <Nav />
       <main className="mx-auto max-w-5xl px-4 sm:px-6 py-8">
-        <h1 className="font-display text-3xl text-parchment">Engram — agent memory</h1>
+        <h1 className="font-display text-3xl text-parchment">Engram - agent memory</h1>
         <p className="mt-1 text-sm text-ash">
-          Persistent, portable, verifiable memory on 0G Storage. You own it — and you
+          Persistent, portable, verifiable memory on 0G Storage. You own it - and you
           control who can read it. Revoke an agent and it forgets.
         </p>
 
@@ -116,7 +116,7 @@ export default function MemoryPage() {
         <div className="mt-8 space-y-4">
           {state?.memories.length === 0 && (
             <div className="rounded-2xl glass p-12 text-center text-sm text-ash">
-              No memories yet. Commit one above — it&apos;s written to 0G Storage and
+              No memories yet. Commit one above - it&apos;s written to 0G Storage and
               owned by the agent.
             </div>
           )}
@@ -170,7 +170,7 @@ export default function MemoryPage() {
                 {/* access control */}
                 <div className="mt-4 border-t hairline pt-3">
                   <div className="text-[11px] text-ash mb-2">
-                    Read access — click to grant / revoke:
+                    Read access - click to grant / revoke:
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {agents.map((a) => {

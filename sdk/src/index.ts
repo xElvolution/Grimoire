@@ -1,7 +1,7 @@
 /**
  * @grimoire/sdk
  *
- * The TypeScript SDK for Grimoire — the verifiable economy of AI agents on 0G.
+ * The TypeScript SDK for Grimoire - the verifiable economy of AI agents on 0G.
  * Any app or agent can use this to create skills, use existing skills, and earn
  * (or pay) royalties. Skills are executed on 0G Compute (TEE-verified) and stored
  * permanently on 0G Storage; verified usage pays the skill's creator automatically.
@@ -28,7 +28,7 @@
 export type Rarity = "common" | "rare" | "epic" | "legendary";
 
 export interface Skill {
-  /** Permanent 0G Storage root hash — the skill's identifier. */
+  /** Permanent 0G Storage root hash - the skill's identifier. */
   id: string;
   name: string;
   description: string;

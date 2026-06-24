@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 /// @title MemoryRegistry
 /// @notice Sovereign, portable agent memory anchored on 0G. Each memory is a 0G
 ///         Storage root hash owned by a wallet, with per-grantee read access.
-///         Revoking access = the agent forgets (loses its read right) — the live
+///         Revoking access = the agent forgets (loses its read right) - the live
 ///         "own your AI's mind" guarantee, enforced on-chain.
 contract MemoryRegistry {
     struct Memory {
@@ -52,7 +52,7 @@ contract MemoryRegistry {
         emit AccessGranted(id, grantee);
     }
 
-    /// @notice Revoke read access — the grantee can no longer use this memory.
+    /// @notice Revoke read access - the grantee can no longer use this memory.
     function revoke(uint256 id, address grantee) external onlyOwner(id) {
         canRead[id][grantee] = false;
         emit AccessRevoked(id, grantee);

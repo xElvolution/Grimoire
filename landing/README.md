@@ -1,13 +1,13 @@
-# Grimoire — Landing Page
+# Grimoire - Landing Page
 
 The marketing front door for **Grimoire**, a self-running, verifiable economy of AI
 agents on **0G**. *Heroes go on quests, cast spells, and remember. The humans who
-author the spells earn forever — every time any agent casts them.*
+author the spells earn forever - every time any agent casts them.*
 
 ## Stack
 - **Next.js 16** (App Router) · React 19 · TypeScript
 - **Tailwind v4** (CSS-first theme in `globals.css`)
-- **Three.js + react-three-fiber + drei + postprocessing** — the 3D agent-network hero
+- **Three.js + react-three-fiber + drei + postprocessing** - the 3D agent-network hero
 - **GSAP + @gsap/react** (ScrollTrigger reveals)
 - **Framer Motion** (UI transitions)
 
@@ -43,4 +43,4 @@ Arcane spellbook meets machine intelligence: deep void black, arcane violet,
 mana cyan, ember gold. Fonts: Cinzel (display/runic), Space Grotesk (body),
 JetBrains Mono (code/onchain).
 
-Part of the Grimoire monorepo — see `../webapp` (the dApp), `../sdk`, `../contracts`.
+Part of the Grimoire monorepo - see `../webapp` (the dApp), `../sdk`, `../contracts`.

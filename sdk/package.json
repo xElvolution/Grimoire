@@ -1,7 +1,7 @@
 {
   "name": "@grimoire/sdk",
   "version": "0.1.0",
-  "description": "TypeScript SDK for Grimoire — the verifiable economy of AI agents on 0G. Create skills, use them, and earn royalties.",
+  "description": "TypeScript SDK for Grimoire - the verifiable economy of AI agents on 0G. Create skills, use them, and earn royalties.",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",

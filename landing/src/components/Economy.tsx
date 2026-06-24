@@ -23,7 +23,7 @@ const comps = [
 export default function Economy() {
   const [active, setActive] = useState(0);
 
-  // cycle the flywheel — one step lights up at a time, like a turning wheel
+  // cycle the flywheel - one step lights up at a time, like a turning wheel
   useEffect(() => {
     const id = setInterval(() => setActive((a) => (a + 1) % flywheel.length), 1300);
     return () => clearInterval(id);
@@ -41,7 +41,7 @@ export default function Economy() {
           </h2>
           <p className="mt-5 text-ash text-lg">
             Every billion-dollar platform did one thing: let creators earn from
-            what they make. Grimoire does it for the age of AI agents — and the
+            what they make. Grimoire does it for the age of AI agents - and the
             intelligence stays owned by the people who created it.
           </p>
         </Reveal>

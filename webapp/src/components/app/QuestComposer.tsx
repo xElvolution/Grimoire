@@ -93,7 +93,7 @@ export default function QuestComposer({
             onChange={(e) => setAgentId(e.target.value)}
             className="rounded-lg border border-white/10 bg-void/60 px-2 py-1.5 text-parchment outline-none"
           >
-            <option value="auto">✨ Auto — orchestrator routes / spawns</option>
+            <option value="auto">✨ Auto - orchestrator routes / spawns</option>
             {agents.map((a) => (
               <option key={a.id} value={a.id}>
                 {a.avatar} {a.name} · {a.specialty} · Lv{a.level}
@@ -163,7 +163,7 @@ export default function QuestComposer({
                 <span className="text-mana">⌬ New agent spawned</span>{" "}
                 <span className="text-parchment">
                   {result.spawnedAgent.by ?? "Orchestrator"} minted{" "}
-                  <span className="font-medium">{result.spawnedAgent.name}</span> — a{" "}
+                  <span className="font-medium">{result.spawnedAgent.name}</span> - a{" "}
                   {result.spawnedAgent.specialty} specialist.
                 </span>
                 <div className="mt-0.5 font-mono text-[10px] text-mana/70">

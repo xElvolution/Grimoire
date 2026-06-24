@@ -20,7 +20,7 @@ export async function POST(
     return NextResponse.json({ error: "Skill not found." }, { status: 404 });
   }
 
-  // Re-run the skill's recipe on 0G Compute — this is the verifiable "use"
+  // Re-run the skill's recipe on 0G Compute - this is the verifiable "use"
   const result = await solve(skill.promptTemplate);
 
   // On a verified (real TEE) use, settle the royalty on-chain to the creator's address

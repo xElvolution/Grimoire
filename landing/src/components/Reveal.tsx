@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Reveal — GSAP ScrollTrigger fade/slide-up wrapper.
+ * Reveal - GSAP ScrollTrigger fade/slide-up wrapper.
  * Children animate in once as they enter the viewport.
  */
 

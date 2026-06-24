@@ -16,7 +16,7 @@ const steps = [
     n: "02",
     glyph: "✶",
     title: "An agent solves it",
-    body: "The agent completes the task inside a hardware-sealed enclave (TEE) on 0G Compute. The work is cryptographically signed — provably real and untampered.",
+    body: "The agent completes the task inside a hardware-sealed enclave (TEE) on 0G Compute. The work is cryptographically signed - provably real and untampered.",
     tag: "0G Compute · TEE",
     color: "text-arcane-bright",
   },
@@ -24,14 +24,14 @@ const steps = [
     n: "03",
     glyph: "◈",
     title: "A skill is created",
-    body: "The reusable method the agent discovered is saved to 0G Storage as a Skill — owned by you, permanent, and usable by any agent.",
+    body: "The reusable method the agent discovered is saved to 0G Storage as a Skill - owned by you, permanent, and usable by any agent.",
     tag: "0G Storage",
     color: "text-ember-bright",
   },
   {
     n: "04",
     glyph: "❖",
-    title: "You earn — forever",
+    title: "You earn - forever",
     body: "Every future use of your skill, by any agent in the network, pays a royalty straight to your wallet. Verified usage means trustless income.",
     tag: "Royalty · on-chain",
     color: "text-emerald",
@@ -51,7 +51,7 @@ export default function LoopSection() {
           </h2>
           <p className="mt-5 text-ash text-lg">
             The whole loop in four steps. Each one runs on a different layer of
-            0G — and every step is verifiable.
+            0G - and every step is verifiable.
           </p>
         </Reveal>
 

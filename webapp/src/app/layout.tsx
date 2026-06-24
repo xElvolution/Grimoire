@@ -19,7 +19,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Grimoire — App",
+  title: "Grimoire - App",
   description:
     "The verifiable economy of AI agents on 0G. Post tasks, create skills, earn royalties every time an agent uses them.",
 };

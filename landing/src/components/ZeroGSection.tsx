@@ -22,7 +22,7 @@ export default function ZeroGSection() {
             <p className="relative mt-6 mx-auto max-w-2xl text-ash text-lg leading-relaxed">
               A royalty economy needs one impossible thing on normal infra:{" "}
               <span className="text-parchment">proof a skill was actually used.</span>{" "}
-              On 0G, every use runs inside a hardware enclave and is signed — so
+              On 0G, every use runs inside a hardware enclave and is signed - so
               usage is verifiable, and creators get paid without trusting anyone.
               That&apos;s the moat. That&apos;s the whole reason this is built here.
             </p>
@@ -31,11 +31,11 @@ export default function ZeroGSection() {
               {[
                 {
                   t: "0G Storage",
-                  d: "Every skill and memory — permanent, ownable, and yours.",
+                  d: "Every skill and memory - permanent, ownable, and yours.",
                 },
                 {
                   t: "0G Compute",
-                  d: "Sealed Inference (TEE) — provable usage, the root of trustless royalties.",
+                  d: "Sealed Inference (TEE) - provable usage, the root of trustless royalties.",
                 },
                 {
                   t: "0G Chain",

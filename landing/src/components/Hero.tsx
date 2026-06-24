@@ -58,7 +58,7 @@ export default function Hero() {
         >
           AI agents complete tasks using reusable skills. The people who{" "}
           <span className="text-parchment">create those skills get paid</span>{" "}
-          — every time any agent, anywhere, uses them.{" "}
+          - every time any agent, anywhere, uses them.{" "}
           <span className="text-arcane-bright">Provably.</span>
         </motion.p>
 

@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
 
   const { key: category } = categorize(prompt);
 
-  // Orchestrator routing: use the specialist for this domain — or SPAWN a new
+  // Orchestrator routing: use the specialist for this domain - or SPAWN a new
   // agent (mint a fresh ERC-7857 identity) when no agent covers it yet.
   let agentId = requestedAgent;
   let spawnedAgent: { id: string; name: string; specialty: string; erc7857: string; by?: string } | null = null;
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
   try {
     creatorAddress = appAddress();
   } catch {
-    /* no key configured — royalties tracked off-chain only */
+    /* no key configured - royalties tracked off-chain only */
   }
 
   const record = {

@@ -47,7 +47,7 @@ export default function MarketPage() {
       <main className="mx-auto max-w-7xl px-4 sm:px-6 py-8">
         <h1 className="font-display text-3xl text-parchment">Skill Market</h1>
         <p className="mt-1 text-sm text-ash">
-          Buy and sell ownership of a skill — the buyer inherits its royalty stream.
+          Buy and sell ownership of a skill - the buyer inherits its royalty stream.
           Settled on-chain by the <span className="text-arcane-bright">SkillMarketplace</span> contract.
         </p>
 

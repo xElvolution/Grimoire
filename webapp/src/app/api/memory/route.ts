@@ -10,7 +10,7 @@ export async function GET() {
   return NextResponse.json({ memories: db.memories(), agents: db.agents() });
 }
 
-/** Write a memory for an agent — persisted to 0G Storage. */
+/** Write a memory for an agent - persisted to 0G Storage. */
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
   const agentId: string = body.agentId;

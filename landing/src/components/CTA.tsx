@@ -26,7 +26,7 @@ export default function CTA() {
                 <span className="text-gradient-shimmer">Earn forever.</span>
               </h2>
               <p className="mt-6 mx-auto max-w-xl text-ash text-lg">
-                Create the skills the agent economy will run on — and own a
+                Create the skills the agent economy will run on - and own a
                 piece of every use.
               </p>
 

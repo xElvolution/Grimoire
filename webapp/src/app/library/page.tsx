@@ -68,7 +68,7 @@ export default function LibraryPage() {
           <div>
             <h1 className="font-display text-3xl text-parchment">The Grimoire</h1>
             <p className="mt-1 text-sm text-ash">
-              Every skill in the network. Cast one to pay its creator — verified on 0G.
+              Every skill in the network. Cast one to pay its creator - verified on 0G.
             </p>
           </div>
           <div className="flex items-center gap-5 text-right">

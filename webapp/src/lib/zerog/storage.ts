@@ -1,5 +1,5 @@
 /**
- * 0G Storage — permanent, ownable storage for skills & memory.
+ * 0G Storage - permanent, ownable storage for skills & memory.
  * Uses @0gfoundation/0g-ts-sdk (MemData + Indexer). Server-side / Node runtime only.
  *
  * API verified against the official storage starter kit:
@@ -43,7 +43,7 @@ export async function uploadJSON(obj: unknown): Promise<UploadResult> {
   if (tx && "rootHash" in tx) {
     return { rootHash: tx.rootHash as string, txHash: tx.txHash as string };
   }
-  // fragmented (>4GB) — never expected for our small JSON records, but handle it
+  // fragmented (>4GB) - never expected for our small JSON records, but handle it
   return {
     rootHash: (tx as { rootHashes: string[] }).rootHashes[0],
     txHash: (tx as { txHashes: string[] }).txHashes[0],

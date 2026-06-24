@@ -13,6 +13,6 @@ console.log(
     ? "ENOUGH for live compute (1.0 reserve + gas headroom)"
     : b >= 1.1
     ? "tight but may work (1.0 reserve, little gas headroom)"
-    : "still under 1.1 — waiting on funding to land"
+    : "still under 1.1 - waiting on funding to land"
 );
 process.exit(0);

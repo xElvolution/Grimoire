@@ -27,7 +27,7 @@ export default function RoyaltyFeed({ events }: { events: RoyaltyEvent[] }) {
       <div className="mt-4 space-y-2 max-h-[22rem] overflow-y-auto pr-1">
         {events.length === 0 && (
           <p className="text-xs text-ash py-8 text-center">
-            No casts yet. Create a skill, then cast it — royalties land here.
+            No casts yet. Create a skill, then cast it - royalties land here.
           </p>
         )}
         <AnimatePresence initial={false}>

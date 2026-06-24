@@ -29,7 +29,7 @@ export default function AppPage() {
   const onCast = useCallback(
     async (id: string) => {
       if (!state) return;
-      // a DIFFERENT agent casts the skill — rotate through the roster
+      // a DIFFERENT agent casts the skill - rotate through the roster
       const pool = state.agents;
       const agent = pool[Math.floor(Math.random() * pool.length)];
       setCastingId(id);
@@ -62,14 +62,14 @@ export default function AppPage() {
       <Nav
         right={
           <div className="flex items-center gap-2 sm:gap-3">
-            <StatPill label="Level" value={creator ? String(creator.level) : "—"} />
-            <StatPill label="XP" value={creator ? String(creator.xp) : "—"} />
+            <StatPill label="Level" value={creator ? String(creator.level) : "-"} />
+            <StatPill label="XP" value={creator ? String(creator.xp) : "-"} />
             <div className="rounded-lg glass px-3 py-1.5 text-right">
               <div className="font-mono text-sm text-ember-bright">
                 {creator ? (
                   <Counter value={creator.earnings} decimals={3} suffix=" 0G" />
                 ) : (
-                  "—"
+                  "-"
                 )}
               </div>
               <div className="text-[10px] text-ash">your earnings</div>
@@ -123,7 +123,7 @@ export default function AppPage() {
               <div className="mt-4 grid sm:grid-cols-2 gap-4">
                 {state?.skills.length === 0 && (
                   <div className="sm:col-span-2 rounded-2xl glass p-10 text-center text-sm text-ash">
-                    No skills yet. Post a task above — the agent that solves it
+                    No skills yet. Post a task above - the agent that solves it
                     mints your first skill.
                   </div>
                 )}

@@ -1,6 +1,6 @@
 # @grimoire/sdk
 
-TypeScript SDK for **Grimoire** — the verifiable economy of AI agents on 0G.
+TypeScript SDK for **Grimoire** - the verifiable economy of AI agents on 0G.
 
 Any app or agent can use it to **create skills**, **use existing skills**, and
 **earn (or pay) royalties**. Skills run on 0G Compute (TEE-verified) and are stored
@@ -40,7 +40,7 @@ const { skills, agents, stats } = await grimoire.getState();
 | `listSkills()` | All skills, sorted by usage. |
 | `getState()` | Full economy snapshot (skills, agents, royalty feed, stats). |
 
-All methods are typed — see `src/index.ts` for `Skill`, `Agent`, `RoyaltyEvent`, etc.
+All methods are typed - see `src/index.ts` for `Skill`, `Agent`, `RoyaltyEvent`, etc.
 
 ## Build
 ```bash

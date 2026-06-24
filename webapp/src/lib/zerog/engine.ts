@@ -3,7 +3,7 @@
  * If the wallet isn't funded yet / no provider is up, and simulation is allowed,
  * it falls back to a clearly-labeled simulated result (verified:false, simulated:true)
  * so the economy loop is demoable. The moment the wallet is funded, it goes live
- * automatically — no code change. Set GRIMOIRE_SIMULATE=0 to force real-only.
+ * automatically - no code change. Set GRIMOIRE_SIMULATE=0 to force real-only.
  */
 
 import { runInference } from "./compute";
@@ -44,6 +44,6 @@ function simulate(prompt: string, reason: string): SolveResult {
     provider: "simulated",
     verified: false,
     simulated: true,
-    note: `Simulated — fund the wallet at faucet.0g.ai to run on 0G Compute (TEE). (${reason.slice(0, 80)})`,
+    note: `Simulated - fund the wallet at faucet.0g.ai to run on 0G Compute (TEE). (${reason.slice(0, 80)})`,
   };
 }

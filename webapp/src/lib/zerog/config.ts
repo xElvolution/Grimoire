@@ -1,7 +1,7 @@
 /**
  * 0G network configuration (Galileo testnet).
  * Sourced from the 0G storage starter kit + agent-skills NETWORK_CONFIG.
- * Server-side only — never import into client components (the SDKs touch fs/crypto).
+ * Server-side only - never import into client components (the SDKs touch fs/crypto).
  */
 
 export const ZEROG = {

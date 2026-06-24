@@ -21,9 +21,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Grimoire — The Economy of AI Agents on 0G",
+  title: "Grimoire - The Economy of AI Agents on 0G",
   description:
-    "AI agents complete tasks using reusable skills. The people who create those skills earn a royalty every time any agent uses them — verifiably, on 0G. A self-running agent economy.",
+    "AI agents complete tasks using reusable skills. The people who create those skills earn a royalty every time any agent uses them - verifiably, on 0G. A self-running agent economy.",
   keywords: [
     "0G",
     "AI agents",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     "ERC-7857",
   ],
   openGraph: {
-    title: "Grimoire — The Economy of AI Agents on 0G",
+    title: "Grimoire - The Economy of AI Agents on 0G",
     description:
       "Create a skill once. Earn every time an agent anywhere uses it. The verifiable agent economy, on 0G.",
     type: "website",

@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 /// @title GrimToken ($GRIM)
-/// @notice The Grimoire economy token — a minimal, self-contained ERC-20 used for
+/// @notice The Grimoire economy token - a minimal, self-contained ERC-20 used for
 ///         staking to publish skills, paying for skill use, and curation rewards.
 ///         Dependency-free for auditability; production would use OpenZeppelin.
 contract GrimToken {
@@ -50,7 +50,7 @@ contract GrimToken {
         return true;
     }
 
-    /// @notice Mint new tokens (minter only — e.g. emissions for curation rewards).
+    /// @notice Mint new tokens (minter only - e.g. emissions for curation rewards).
     function mint(address to, uint256 value) external {
         if (msg.sender != minter) revert NotMinter();
         _mint(to, value);

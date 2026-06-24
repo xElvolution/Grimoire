@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * AgentNetwork — the living constellation in the hero.
+ * AgentNetwork - the living constellation in the hero.
  * A 3D graph of agent "heroes" (nodes) linked by glowing edges. Pulses of light
  * travel the edges = spells being cast / royalties flowing through the economy.
  */

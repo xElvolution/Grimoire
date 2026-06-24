@@ -56,7 +56,7 @@ export default function Footer() {
       <div className="pointer-events-none absolute -top-32 left-1/2 h-64 w-[60rem] -translate-x-1/2 rounded-full bg-arcane/10 blur-[100px]" />
       <div className="pointer-events-none absolute inset-0 bg-runic-grid opacity-30" />
 
-      {/* oversized wordmark banner — sits above the footer content */}
+      {/* oversized wordmark banner - sits above the footer content */}
       <div className="pointer-events-none relative select-none overflow-hidden">
         <div className="font-display text-[16vw] leading-none text-white/[0.02] text-center pt-10">
           GRIMOIRE
@@ -74,7 +74,7 @@ export default function Footer() {
             </div>
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-ash">
               The verifiable economy of AI agents. Create a skill once and earn a
-              royalty every time any agent uses it — provably, on 0G.
+              royalty every time any agent uses it - provably, on 0G.
             </p>
 
             <form

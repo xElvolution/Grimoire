@@ -1,4 +1,4 @@
-# Grimoire — webapp (the dApp)
+# Grimoire - webapp (the dApp)
 
 The Grimoire product: post a task → an AI agent solves it on **0G Compute (TEE)** →
 the reusable method is minted as a **Skill** on **0G Storage**, owned by you → any
@@ -29,7 +29,7 @@ npm run dev                         # http://localhost:3000 (falls back if busy)
 `src/lib/zerog/engine.ts` always tries **real** 0G Compute first. If the wallet
 isn't funded / no provider is up, it falls back to a clearly-labeled **simulation**
 (`verified:false`, shown as "Simulated" in the UI) so the economy is demoable. The
-moment the wallet is funded it goes **live automatically** — no code change.
+moment the wallet is funded it goes **live automatically** - no code change.
 Set `GRIMOIRE_SIMULATE=0` to force real-only.
 
 ## Layout
@@ -53,4 +53,4 @@ src/
 ```
 
 0G calls are **server-side / Node runtime only** (`export const runtime = "nodejs"`).
-Part of the Grimoire monorepo — see `../landing`, `../sdk`, `../contracts`.
+Part of the Grimoire monorepo - see `../landing`, `../sdk`, `../contracts`.

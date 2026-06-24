@@ -27,7 +27,7 @@ const layers = [
   },
   {
     name: "Skills",
-    desc: "Reusable, user-owned skills — usable by any agent",
+    desc: "Reusable, user-owned skills - usable by any agent",
     sub: "Stored on 0G. Earn on every use.",
     accent: "from-arcane/30 to-arcane/5",
     text: "text-arcane-bright",
@@ -41,7 +41,7 @@ const layers = [
   },
   {
     name: "Proof",
-    desc: "Every action runs in a TEE — verifiable & untampered",
+    desc: "Every action runs in a TEE - verifiable & untampered",
     sub: "What makes royalties trustless.",
     accent: "from-arcane-deep/40 to-arcane-deep/5",
     text: "text-arcane",
@@ -70,7 +70,7 @@ export default function Architecture() {
               <span className="text-gradient-arcane">One living stack.</span>
             </h2>
             <p className="mt-5 text-ash text-lg leading-relaxed">
-              Memory, skills, orchestration and economy were never separate —
+              Memory, skills, orchestration and economy were never separate -
               they&apos;re layers of a single organism. Each one makes the others
               stronger, and every layer is anchored to a real primitive of the 0G
               network.
@@ -84,7 +84,7 @@ export default function Architecture() {
                 <li key={k} className="flex items-start gap-3">
                   <span className="mt-1 text-emerald">✓</span>
                   <span className="text-ash">
-                    <span className="text-parchment font-medium">{k}</span> — {v}
+                    <span className="text-parchment font-medium">{k}</span> - {v}
                   </span>
                 </li>
               ))}

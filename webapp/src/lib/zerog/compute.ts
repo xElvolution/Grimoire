@@ -1,5 +1,5 @@
 /**
- * 0G Compute — verifiable LLM inference inside a TEE.
+ * 0G Compute - verifiable LLM inference inside a TEE.
  * Uses @0glabs/0g-serving-broker (createZGComputeNetworkBroker).
  * Server-side / Node runtime only.
  *
@@ -94,7 +94,7 @@ async function ensureDeposit(broker: Broker) {
     deposited = true;
   } catch (e) {
     throw new Error(
-      `Could not fund the 0G Compute ledger — is the wallet funded? (${(e as Error).message})`
+      `Could not fund the 0G Compute ledger - is the wallet funded? (${(e as Error).message})`
     );
   }
 }
@@ -164,7 +164,7 @@ export async function runInference(prompt: string): Promise<InferenceResult> {
     res.headers.get("zg-res-key") ||
     data?.id;
 
-  // TEE verification + fee settlement — param order is load-bearing
+  // TEE verification + fee settlement - param order is load-bearing
   let verified = teeVerified;
   try {
     const ok = await broker.inference.processResponse(
