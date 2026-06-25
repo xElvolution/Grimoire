@@ -97,11 +97,24 @@ body {
   .hairline { border-color: rgba(154, 143, 176, 0.14); }
 
   .bg-runic-grid {
+    position: relative;
+    isolation: isolate;
+  }
+  .bg-runic-grid::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
     background-image:
       linear-gradient(rgba(139, 92, 246, 0.06) 1px, transparent 1px),
       linear-gradient(90deg, rgba(139, 92, 246, 0.06) 1px, transparent 1px);
     background-size: 64px 64px;
     mask-image: radial-gradient(ellipse 70% 70% at 50% 40%, #000 30%, transparent 75%);
+  }
+  .bg-runic-grid > * {
+    position: relative;
+    z-index: 1;
   }
 
   .glow-arcane { box-shadow: var(--shadow-glow-arcane); }
