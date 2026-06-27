@@ -1,0 +1,30 @@
+flowchart LR
+    subgraph neurons["Neurons - nodes that fire"]
+        A1["Agent neuron<br/>specialty + level"]
+        M1["Memory neuron<br/>explicit engram"]
+        S1["Skill neuron<br/>implicit engram"]
+        CORE["Core hub<br/>shared engram field"]
+    end
+
+    subgraph synapses["Synapses - weighted connections"]
+        OW["owns"]
+        GR["grantedTo"]
+        CS["cast / used"]
+        PL["plasticity weight"]
+    end
+
+    subgraph fire["Firing - activation"]
+        RET["retrieve() ranks neurons"]
+        INJ["inject into TEE prompt"]
+        PUL["pulse in EngramBrain"]
+    end
+
+    CORE --- A1
+    CORE --- M1
+    A1 --> OW --> M1
+    A1 --> GR --> M1
+    A1 --> CS --> S1
+    OW --> PL
+    GR --> PL
+    CS --> PL
+    RET --> INJ --> PUL

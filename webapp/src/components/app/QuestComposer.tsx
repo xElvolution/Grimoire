@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useGrimoireWallet } from "@/lib/wallet";
 import type { Agent } from "@/lib/types";
 import { postQuest, type QuestResponse } from "@/lib/client";
 
@@ -9,24 +10,27 @@ const STEPS = [
   "Routing task to agent…",
   "Running inside 0G Compute (TEE)…",
   "Verifying the response…",
-  "Minting skill to 0G Storage…",
+  "Evaluating if a skill should be minted…",
   "Done.",
 ];
 
 const EXAMPLES = [
-  "Summarize the top 3 risks in a DeFi lending protocol",
-  "Write a cold outreach email to a crypto VC",
-  "Draft a function that debounces an async call in TypeScript",
-  "Compare three L1s for an AI agent app",
+  "Summarize the top 3 risks in a DeFi lending protocol with verifiable attestation criteria",
+  "Design a reusable framework for comparing L1 chains for AI agent deployments",
+  "Draft a production-grade TypeScript debounce utility with typed async cancellation",
+  "Compare three L1s for an AI agent app with TEE, storage, and fee tradeoffs",
 ];
 
 export default function QuestComposer({
   agents,
   onSolved,
+  walletConnected = false,
 }: {
   agents: Agent[];
   onSolved: () => void;
+  walletConnected?: boolean;
 }) {
+  const { address } = useGrimoireWallet();
   const [prompt, setPrompt] = useState("");
   const [agentId, setAgentId] = useState("auto");
   const [loading, setLoading] = useState(false);
@@ -42,12 +46,13 @@ export default function QuestComposer({
   }, [loading]);
 
   async function submit() {
+    if (!walletConnected || !address) return;
     if (prompt.trim().length < 4) return;
     setLoading(true);
     setResult(null);
     setError(null);
     try {
-      const res = await postQuest(prompt, 0, agentId);
+      const res = await postQuest(prompt, 0, agentId, address);
       setStep(STEPS.length - 1);
       setResult(res);
       onSolved();
@@ -60,15 +65,19 @@ export default function QuestComposer({
 
   return (
     <div className="rounded-2xl glass rune-border p-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <h2 className="font-display text-xl text-parchment">Post a task</h2>
-        <span className="text-[11px] text-ash">an agent solves it · a skill is born</span>
+        <span className="text-[11px] text-ash text-right">
+          {walletConnected && address
+            ? "answer always · skill only if reusable"
+            : "sign in to post tasks"}
+        </span>
       </div>
 
       <textarea
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
-        placeholder="Describe a task. The agent that solves it creates a reusable skill you own…"
+        placeholder="Describe a substantial task. You always get an answer - a skill is minted only if the method is unique and reusable."
         rows={3}
         className="mt-4 w-full resize-none rounded-xl border border-white/10 bg-void/60 px-4 py-3 text-sm text-parchment outline-none transition placeholder:text-ash/40 focus:border-arcane/60"
       />
@@ -77,10 +86,11 @@ export default function QuestComposer({
         {EXAMPLES.map((ex) => (
           <button
             key={ex}
+            type="button"
             onClick={() => setPrompt(ex)}
-            className="rounded-full border border-white/5 bg-white/[0.02] px-2.5 py-1 text-[11px] text-ash hover:text-parchment hover:border-arcane/40 transition"
+            className="rounded-full border border-white/5 bg-white/[0.02] px-2.5 py-1 text-[11px] text-ash hover:text-parchment hover:border-arcane/40 transition text-left"
           >
-            {ex}
+            {ex.length > 52 ? ex.slice(0, 52) + "…" : ex}
           </button>
         ))}
       </div>
@@ -102,15 +112,15 @@ export default function QuestComposer({
           </select>
         </label>
         <button
+          type="button"
           onClick={submit}
-          disabled={loading || prompt.trim().length < 4}
+          disabled={loading || !walletConnected || prompt.trim().length < 4}
           className="rounded-xl bg-gradient-to-r from-ember-bright to-ember px-6 py-2.5 text-sm font-medium text-void hover:scale-[1.02] disabled:opacity-50 transition"
         >
-          {loading ? "Solving…" : "Solve & create skill"}
+          {!walletConnected ? "Sign in first" : loading ? "Solving…" : "Solve task"}
         </button>
       </div>
 
-      {/* live solving steps */}
       <AnimatePresence>
         {loading && (
           <motion.div
@@ -136,48 +146,77 @@ export default function QuestComposer({
         )}
       </AnimatePresence>
 
-      {/* result */}
       <AnimatePresence>
         {result && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-4 rounded-xl border border-white/10 bg-void/50 p-4"
+            className="mt-4 rounded-xl border border-white/10 bg-void/50 p-4 space-y-3"
           >
-            <div className="flex items-center justify-between">
-              <span className="font-display text-parchment">
-                {result.skill.name}
-              </span>
-              {result.skill.verified ? (
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-display text-parchment">Answer</span>
+              {result.quest.verified ? (
                 <span className="rounded-full bg-emerald/10 border border-emerald/30 px-2 py-0.5 text-[10px] text-emerald">
-                  ✓ Verified in TEE
+                  ✓ TEE
                 </span>
               ) : (
                 <span className="rounded-full bg-ember/10 border border-ember/30 px-2 py-0.5 text-[10px] text-ember-bright">
-                  Simulated
+                  sim
                 </span>
               )}
             </div>
-            {result.spawnedAgent && (
-              <div className="mt-3 rounded-lg border border-mana/30 bg-mana/5 px-3 py-2 text-xs">
-                <span className="text-mana">⌬ New agent spawned</span>{" "}
-                <span className="text-parchment">
-                  {result.spawnedAgent.by ?? "Orchestrator"} minted{" "}
-                  <span className="font-medium">{result.spawnedAgent.name}</span> - a{" "}
-                  {result.spawnedAgent.specialty} specialist.
-                </span>
-                <div className="mt-0.5 font-mono text-[10px] text-mana/70">
-                  ERC-7857 {result.spawnedAgent.erc7857}
+            <p className="text-sm text-ash whitespace-pre-wrap">{result.quest.answer}</p>
+
+            {result.skill ? (
+              <div className="rounded-lg border border-ember/30 bg-ember/5 px-3 py-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-ember-bright font-medium">
+                    ✦ Skill minted: {result.skill.name}
+                  </span>
+                  <span className="text-[10px] text-ash uppercase">{result.skill.rarity}</span>
                 </div>
+                <p className="mt-1 text-[11px] text-ash">{result.skillNote}</p>
+              </div>
+            ) : (
+              <div className="rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2">
+                <span className="text-xs text-ash">No skill minted</span>
+                <p className="mt-1 text-[11px] text-ash/80">{result.skillNote}</p>
               </div>
             )}
-            <p className="mt-2 text-xs text-ash line-clamp-3">{result.skill.sampleOutput}</p>
-            <div className="mt-3 flex items-center justify-between text-[11px] text-ash/70 font-mono">
-              <span>0G Storage: {result.quest.rootHash?.slice(0, 14)}…</span>
-              <span className="text-arcane-bright">minted to {result.skill.creator}</span>
-            </div>
-            {result.note && (
-              <p className="mt-2 text-[11px] text-ember-bright/80">{result.note}</p>
+
+            {result.spawnedAgent && (
+              <div className="rounded-lg border border-mana/30 bg-mana/5 px-3 py-2 text-xs">
+                <span className="text-mana">⌬ New agent spawned</span>{" "}
+                <span className="text-parchment">{result.spawnedAgent.name}</span>
+                <span className="text-ash"> · {result.spawnedAgent.specialty}</span>
+              </div>
+            )}
+
+            {result.reflex && (
+              <div className="text-[11px] text-ash">
+                Spinal reflex: <span className="text-mana">{result.reflex}</span>
+              </div>
+            )}
+
+            {result.firedMemories && result.firedMemories.length > 0 && (
+              <div className="rounded-lg border border-cyan/30 bg-cyan/5 px-3 py-2">
+                <div className="text-xs text-cyan-300 font-medium">
+                  ⚡ {result.firedMemories.length} memory neuron(s) fired
+                </div>
+                <ul className="mt-1 space-y-0.5 text-[11px] text-ash">
+                  {result.firedMemories.map((m) => (
+                    <li key={m.id}>
+                      [{m.kind ?? "memory"}] {m.label}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {result.castSkill && (
+              <div className="rounded-lg border border-ember/20 bg-ember/5 px-3 py-2 text-xs text-ember-bright">
+                Cast implicit skill: {result.castSkill.name}
+              </div>
             )}
           </motion.div>
         )}

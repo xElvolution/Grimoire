@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/store";
 import { solve } from "@/lib/zerog/engine";
 import { payRoyalty } from "@/lib/zerog/payments";
+import { injectContext, retrieveMemories } from "@/lib/orchestrator";
+import { publishMindManifest } from "@/lib/mind";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -20,17 +22,39 @@ export async function POST(
     return NextResponse.json({ error: "Skill not found." }, { status: 404 });
   }
 
-  // Re-run the skill's recipe on 0G Compute - this is the verifiable "use"
-  const result = await solve(skill.promptTemplate);
+  const memories = retrieveMemories(
+    agentId,
+    skill.promptTemplate,
+    db.memories(),
+    db.agents(),
+    db.synapses(),
+    4
+  );
 
-  // On a verified (real TEE) use, settle the royalty on-chain to the creator's address
+  const enriched = injectContext(skill.promptTemplate, memories, [skill]);
+  const firedMemoryIds = memories.map((m) => m.id);
+
+  let result: Awaited<ReturnType<typeof solve>>;
+  try {
+    result = await solve(enriched);
+  } catch (e) {
+    db.addFailureMemory(agentId, skill.promptTemplate, (e as Error).message);
+    return NextResponse.json({ error: (e as Error).message }, { status: 500 });
+  }
+
+  db.recordNeuronFire(agentId, firedMemoryIds, [skill.id]);
+
   let onchain: { txHash: string; url: string } | null = null;
   if (result.verified && !result.simulated && skill.creatorAddress) {
     onchain = await payRoyalty(skill.creatorAddress, skill.royaltyPerUse);
   }
 
-  // Record the verified use: bumps uses, pays the creator a royalty, awards agent XP
   const royalty = db.recordUse(id, agentId, onchain?.txHash, result.verified);
+
+  const agent = db.getAgent(agentId);
+  if (agent) {
+    await publishMindManifest(agent, db.memories(), db.skills(), db.synapses());
+  }
 
   return NextResponse.json({
     ok: true,
@@ -46,5 +70,7 @@ export async function POST(
     onchain,
     agent: db.getAgent(agentId),
     skill: db.getSkill(id),
+    firedMemories: memories,
+    firedMemoryIds,
   });
 }

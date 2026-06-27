@@ -1,28 +1,58 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Nav from "@/components/app/Nav";
 import {
   fetchMemory,
+  fetchState,
+  fetchBrain,
   writeMemory,
   setMemoryAccess,
+  consolidateMemory,
+  linkAgents,
   type MemoryState,
+  type BrainState,
 } from "@/lib/client";
+
+const GrimoireBrain = dynamic(() => import("@/components/brain/GrimoireBrain"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[320px] sm:h-[400px] w-full rounded-2xl border border-arcane/20 bg-void/80 animate-pulse" />
+  ),
+});
 
 export default function MemoryPage() {
   const [state, setState] = useState<MemoryState | null>(null);
+  const [networkSkills, setNetworkSkills] = useState<
+    Awaited<ReturnType<typeof fetchState>>["network"]["skills"]
+  >([]);
+  const [royalties, setRoyalties] = useState<
+    Awaited<ReturnType<typeof fetchState>>["network"]["royalties"]
+  >([]);
+  const [brain, setBrain] = useState<BrainState | null>(null);
+  const [linkPartner, setLinkPartner] = useState("lyra");
+  const [memoryKind, setMemoryKind] = useState<"episodic" | "semantic" | "preference">("preference");
   const [agentId, setAgentId] = useState("arden");
   const [label, setLabel] = useState("");
   const [content, setContent] = useState("");
   const [saving, setSaving] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     try {
-      const s = await fetchMemory();
-      setState(s);
-      if (s.agents[0] && !s.agents.find((a) => a.id === agentId)) {
-        setAgentId(s.agents[0].id);
+      const [mem, econ, b] = await Promise.all([
+        fetchMemory(),
+        fetchState(),
+        fetchBrain(),
+      ]);
+      setState(mem);
+      setBrain(b);
+      setNetworkSkills(econ.network.skills);
+      setRoyalties(econ.network.royalties);
+      if (mem.agents[0] && !mem.agents.find((a) => a.id === agentId)) {
+        setAgentId(mem.agents[0].id);
       }
     } catch {
       /* ignore */
@@ -37,7 +67,7 @@ export default function MemoryPage() {
     if (content.trim().length < 3) return;
     setSaving(true);
     try {
-      await writeMemory(agentId, label, content);
+      await writeMemory(agentId, label, content, memoryKind);
       setLabel("");
       setContent("");
       await refresh();
@@ -57,22 +87,72 @@ export default function MemoryPage() {
     }
   }
 
+  async function doLink() {
+    try {
+      await linkAgents(agentId, linkPartner);
+      await refresh();
+    } catch {
+      /* ignore */
+    }
+  }
+
+  async function doConsolidate(memoryId: string) {
+    try {
+      await consolidateMemory(memoryId);
+      await refresh();
+    } catch {
+      /* ignore */
+    }
+  }
+
   const agents = state?.agents ?? [];
+  const memories = state?.memories ?? [];
   const agentName = (id: string) => agents.find((a) => a.id === id)?.name ?? id;
 
   return (
     <div className="min-h-screen bg-runic-grid">
       <Nav />
-      <main className="mx-auto max-w-5xl px-4 sm:px-6 py-8">
-        <h1 className="font-display text-3xl text-parchment">Engram - agent memory</h1>
-        <p className="mt-1 text-sm text-ash">
-          Persistent, portable, verifiable memory on 0G Storage. You own it - and you
-          control who can read it. Revoke an agent and it forgets.
-        </p>
+      <main className="mx-auto max-w-6xl px-4 sm:px-6 py-8">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+          <div>
+            <h1 className="font-display text-3xl text-parchment">Engram</h1>
+            <p className="mt-1 text-sm text-ash max-w-xl">
+              The shared brain of your agents - memories on 0G Storage, access
+              controlled synapse by synapse. Revoke and the agent forgets.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3 text-[10px] text-ash">
+            <span className="flex items-center gap-1.5">
+              <span className="h-2 w-2 rounded-full bg-mana" /> agent node
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="h-2 w-2 rounded-full bg-emerald" /> verified memory
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="h-2 w-2 rounded-full bg-ember-bright" /> engram core
+            </span>
+          </div>
+        </div>
 
-        {/* write memory */}
-        <div className="mt-6 rounded-2xl glass rune-border p-6">
-          <div className="flex flex-wrap items-center gap-3">
+        <div className="mt-6">
+          <GrimoireBrain
+            skills={networkSkills}
+            memories={memories}
+            agents={agents}
+            royalties={royalties}
+            synapses={brain?.synapses ?? []}
+            selectedId={selectedId}
+          />
+        </div>
+
+        <div className="mt-6 grid gap-6 lg:grid-cols-5">
+          {/* write panel */}
+          <div className="lg:col-span-2 rounded-2xl glass rune-border p-6">
+            <h2 className="font-display text-lg text-parchment">Commit memory</h2>
+            <p className="mt-1 text-[11px] text-ash">
+              Writes permanently to 0G Storage and lights a new node in the brain.
+            </p>
+            <div className="mt-4 flex flex-wrap items-center gap-3">
             <label className="flex items-center gap-2 text-xs text-ash">
               Agent
               <select
@@ -93,12 +173,45 @@ export default function MemoryPage() {
               placeholder="label (e.g. user preferences)"
               className="flex-1 min-w-[10rem] rounded-lg border border-white/10 bg-void/60 px-3 py-1.5 text-sm text-parchment outline-none placeholder:text-ash/40 focus:border-arcane/60"
             />
+            <label className="flex items-center gap-2 text-xs text-ash">
+              Kind
+              <select
+                value={memoryKind}
+                onChange={(e) => setMemoryKind(e.target.value as typeof memoryKind)}
+                className="rounded-lg border border-white/10 bg-void/60 px-2 py-1.5 text-parchment outline-none"
+              >
+                <option value="preference">preference (explicit)</option>
+                <option value="episodic">episodic</option>
+                <option value="semantic">semantic</option>
+              </select>
+            </label>
+          </div>
+          <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-ash">
+            <span>Corpus callosum - link agents:</span>
+            <select
+              value={linkPartner}
+              onChange={(e) => setLinkPartner(e.target.value)}
+              className="rounded-lg border border-white/10 bg-void/60 px-2 py-1 text-parchment outline-none"
+            >
+              {agents.filter((a) => a.id !== agentId).map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.avatar} {a.name}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={doLink}
+              className="rounded-lg border border-mana/30 px-2 py-1 text-mana hover:bg-mana/10"
+            >
+              Link synapses
+            </button>
           </div>
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            rows={3}
-            placeholder="What should this agent remember? (stored permanently on 0G)"
+              rows={4}
+              placeholder="What should this agent remember?"
             className="mt-3 w-full resize-none rounded-xl border border-white/10 bg-void/60 px-4 py-3 text-sm text-parchment outline-none placeholder:text-ash/40 focus:border-arcane/60"
           />
           <div className="mt-3 flex justify-end">
@@ -113,21 +226,25 @@ export default function MemoryPage() {
         </div>
 
         {/* memory list */}
-        <div className="mt-8 space-y-4">
-          {state?.memories.length === 0 && (
-            <div className="rounded-2xl glass p-12 text-center text-sm text-ash">
-              No memories yet. Commit one above - it&apos;s written to 0G Storage and
-              owned by the agent.
+          <div className="lg:col-span-3 space-y-3">
+            {memories.length === 0 && (
+              <div className="rounded-2xl glass p-10 text-center text-sm text-ash">
+                No memories yet. Commit one - the neural mirror will wake up.
             </div>
           )}
           <AnimatePresence initial={false}>
-            {state?.memories.map((m) => (
+              {memories.map((m) => (
               <motion.div
                 key={m.id}
                 layout
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-2xl glass p-5"
+                  onClick={() => setSelectedId(m.id)}
+                  className={`rounded-2xl glass p-5 cursor-pointer transition ${
+                    selectedId === m.id
+                      ? "ring-1 ring-arcane/50 glow-arcane"
+                      : "hover:border-arcane/30"
+                  }`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
@@ -144,16 +261,27 @@ export default function MemoryPage() {
                           local
                         </span>
                       )}
+                      {m.kind && (
+                        <span className="rounded-full bg-arcane/10 border border-arcane/30 px-2 py-0.5 text-[10px] text-arcane-bright">
+                          {m.kind}
+                        </span>
+                      )}
+                      {m.superseded && (
+                        <span className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] text-ash">
+                          superseded
+                        </span>
+                      )}
                     </div>
                     <div className="text-[11px] text-ash">
-                      owned by {agentName(m.agentId)}
-                    </div>
+                        synapse owned by {agentName(m.agentId)}
+                      </div>
                   </div>
                   {m.txHash && (
                     <a
                       href={`https://chainscan-galileo.0g.ai/tx/${m.txHash}`}
                       target="_blank"
                       rel="noreferrer"
+                        onClick={(e) => e.stopPropagation()}
                       className="shrink-0 text-[10px] text-mana hover:underline"
                     >
                       tx ↗
@@ -161,16 +289,30 @@ export default function MemoryPage() {
                   )}
                 </div>
 
-                <p className="mt-2 text-sm text-ash">{m.content}</p>
+                  <p className="mt-2 text-sm text-ash line-clamp-2">{m.content}</p>
 
                 <div className="mt-3 font-mono text-[10px] text-ash/50">
                   0G: {m.id.slice(0, 18)}…{m.id.slice(-6)}
                 </div>
 
-                {/* access control */}
-                <div className="mt-4 border-t hairline pt-3">
+                <div className="mt-4 border-t hairline pt-3 flex flex-wrap gap-2">
+                  {m.kind === "episodic" && !m.superseded && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        doConsolidate(m.id);
+                      }}
+                      className="rounded-full px-2.5 py-1 text-[11px] border border-ember/30 text-ember-bright hover:bg-ember/10"
+                    >
+                      Consolidate → semantic
+                    </button>
+                  )}
+                </div>
+
+                <div className="mt-3 border-t hairline pt-3">
                   <div className="text-[11px] text-ash mb-2">
-                    Read access - click to grant / revoke:
+                      Read access - grant / revoke synapses:
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {agents.map((a) => {
@@ -180,7 +322,10 @@ export default function MemoryPage() {
                         <button
                           key={a.id}
                           disabled={owner}
-                          onClick={() => toggle(m.id, a.id, !granted)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggle(m.id, a.id, !granted);
+                            }}
                           className={`rounded-full px-2.5 py-1 text-[11px] border transition ${
                             granted
                               ? "border-emerald/40 bg-emerald/10 text-emerald"
@@ -197,6 +342,7 @@ export default function MemoryPage() {
               </motion.div>
             ))}
           </AnimatePresence>
+          </div>
         </div>
       </main>
     </div>

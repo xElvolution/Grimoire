@@ -191,6 +191,36 @@ export class GrimoireClient {
     return this.get<GrimoireState>("/api/state");
   }
 
+  /** Neuron graph + brain health scan. */
+  async getBrain(): Promise<{
+    graph: unknown;
+    synapses: unknown[];
+    health: unknown[];
+    stats: Record<string, number>;
+  }> {
+    return this.get("/api/brain");
+  }
+
+  /** Commit explicit memory to Engram (0G Storage). */
+  async writeMemory(
+    agentId: string,
+    label: string,
+    content: string,
+    kind?: string
+  ): Promise<{ memory: unknown; verified: boolean }> {
+    return this.post("/api/memory", { agentId, label, content, kind });
+  }
+
+  /** Consolidate episodic → semantic memory. */
+  async consolidateMemory(memoryId?: string, agentId?: string) {
+    return this.post("/api/memory/consolidate", { memoryId, agentId });
+  }
+
+  /** Link two agents (corpus callosum - shared explicit memory). */
+  async linkAgents(agentId: string, partnerId: string) {
+    return this.post("/api/memory/link", { agentId, partnerId });
+  }
+
   // -- internals ------------------------------------------------------------
 
   private async get<T>(path: string): Promise<T> {

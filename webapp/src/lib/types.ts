@@ -2,6 +2,10 @@
 
 export type Rarity = "common" | "rare" | "epic" | "legendary";
 
+export type MemoryKind = "episodic" | "semantic" | "failure" | "preference";
+
+export type SynapseKind = "owns" | "granted" | "cast" | "spawned" | "linked";
+
 export type Skill = {
   id: string; // 0G Storage root hash (permanent identifier)
   name: string;
@@ -28,7 +32,7 @@ export type Quest = {
   id: string;
   prompt: string;
   bounty: number;
-  status: "open" | "solving" | "solved";
+  status: "open" | "solving" | "solved" | "failed";
   creator: string;
   agentId?: string;
   answer?: string;
@@ -38,6 +42,10 @@ export type Quest = {
   rootHash?: string;
   txHash?: string;
   createdAt: number;
+  firedMemoryIds?: string[];
+  firedSkillIds?: string[];
+  reflex?: string;
+  failureReason?: string;
 };
 
 export type Agent = {
@@ -52,11 +60,13 @@ export type Agent = {
   avatar: string; // emoji/glyph
   spawnedBy?: string; // name of the agent that minted this one
   createdAt?: number;
+  linkedAgents?: string[]; // corpus callosum - shared memory partners
 };
 
 export type Creator = {
   handle: string;
   address?: string;
+  connected?: boolean;
   xp: number;
   level: number;
   earnings: number;
@@ -72,6 +82,17 @@ export type Memory = {
   txHash?: string;
   verified: boolean; // stored on real 0G (vs local)
   grantedTo: string[]; // agent ids with read access
+  kind?: MemoryKind;
+  consolidatedFrom?: string; // episodic source id
+  superseded?: boolean; // episodic faded after consolidation
+};
+
+export type Synapse = {
+  from: string;
+  to: string;
+  kind: SynapseKind;
+  weight: number;
+  lastFired?: number;
 };
 
 export type RoyaltyEvent = {
@@ -79,9 +100,21 @@ export type RoyaltyEvent = {
   skillId: string;
   skillName: string;
   amount: number;
-  to: string; // creator handle
+  to: string; // creator display
+  toAddress?: string; // wallet that receives royalties
   agentId: string;
   txHash?: string;
   verified: boolean;
   at: number;
+};
+
+export type MindManifest = {
+  kind: "grimoire-mind";
+  agentId: string;
+  neurons: {
+    memories: string[];
+    skills: string[];
+  };
+  synapses: Synapse[];
+  updatedAt: number;
 };

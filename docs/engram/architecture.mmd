@@ -1,0 +1,18 @@
+flowchart TB
+    subgraph identity["Agent identity (ERC-7857)"]
+        A[AgentRegistry]
+    end
+    subgraph mind["The mind - 0G Storage"]
+        M[Memories - episodic / semantic]
+        S[Skills - procedural]
+    end
+    subgraph access["Access control - on-chain"]
+        MR[MemoryRegistry grant / revoke]
+    end
+    subgraph compute["Inference - 0G Compute TEE"]
+        TEE[Verified skill use + memory retrieval]
+    end
+
+    A -->|"metadata root hash"| mind
+    MR -->|"canRead"| M
+    TEE -->|"reads skills + granted memories"| mind

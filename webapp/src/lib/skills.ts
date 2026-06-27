@@ -37,7 +37,6 @@ function titleCase(s: string): string {
 }
 
 export function rarityFor(prompt: string, verified: boolean): Rarity {
-  // verified + longer/more specific prompts skew rarer
   const score = Math.min(100, prompt.length / 2 + (verified ? 30 : 0));
   if (score > 80) return "legendary";
   if (score > 60) return "epic";
@@ -54,4 +53,20 @@ export const RARITY_META: Record<Rarity, { color: string; label: string }> = {
 
 export function royaltyForRarity(r: Rarity): number {
   return { common: 0.002, rare: 0.005, epic: 0.012, legendary: 0.03 }[r];
+}
+
+export function normalizeText(s: string) {
+  return s.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+/** Word overlap similarity 0..1 - used by orchestrator and mint gate. */
+export function wordSimilarity(a: string, b: string): number {
+  const wa = new Set(normalizeText(a).split(" ").filter((w) => w.length > 3));
+  const wb = new Set(normalizeText(b).split(" ").filter((w) => w.length > 3));
+  if (wa.size === 0 || wb.size === 0) return 0;
+  let overlap = 0;
+  wa.forEach((w) => {
+    if (wb.has(w)) overlap++;
+  });
+  return overlap / Math.max(wa.size, wb.size);
 }

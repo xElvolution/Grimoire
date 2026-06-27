@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cinzel, Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import AppProviders from "@/components/providers/AppProviders";
 import "./globals.css";
 
 const cinzel = Cinzel({
@@ -58,7 +59,7 @@ export default function RootLayout({
       className={`${cinzel.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-void text-parchment font-sans selection:bg-arcane/30 selection:text-white">
-        {children}
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );

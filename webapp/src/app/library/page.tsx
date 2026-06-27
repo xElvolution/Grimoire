@@ -5,11 +5,13 @@ import { motion } from "framer-motion";
 import Nav from "@/components/app/Nav";
 import SkillCard from "@/components/app/SkillCard";
 import { fetchState, runSkill, type GrimoireState } from "@/lib/client";
+import { useGrimoireWallet } from "@/lib/wallet";
 
 const CATEGORIES = ["All", "Research", "Writing", "Code", "Finance", "Strategy", "General"];
 const RARITIES = ["All", "legendary", "epic", "rare", "common"];
 
 export default function LibraryPage() {
+  const { address, isConnected } = useGrimoireWallet();
   const [state, setState] = useState<GrimoireState | null>(null);
   const [castingId, setCastingId] = useState<string | null>(null);
   const [cat, setCat] = useState("All");
@@ -18,11 +20,11 @@ export default function LibraryPage() {
 
   const refresh = useCallback(async () => {
     try {
-      setState(await fetchState());
+      setState(await fetchState(isConnected ? address : undefined));
     } catch {
       /* ignore */
     }
-  }, []);
+  }, [address, isConnected]);
   useEffect(() => {
     refresh();
   }, [refresh]);
@@ -45,7 +47,7 @@ export default function LibraryPage() {
   );
 
   const skills = useMemo(() => {
-    let s = state?.skills ?? [];
+    let s = state?.network?.skills ?? state?.skills ?? [];
     if (cat !== "All") s = s.filter((k) => k.category === cat);
     if (rarity !== "All") s = s.filter((k) => k.rarity === rarity);
     if (q.trim()) {
@@ -74,15 +76,15 @@ export default function LibraryPage() {
           <div className="flex items-center gap-5 text-right">
             <div>
               <div className="font-display text-2xl text-parchment">
-                {state?.skills.length ?? 0}
+                {state?.network?.skills.length ?? state?.skills.length ?? 0}
               </div>
               <div className="text-[11px] text-ash">skills</div>
             </div>
             <div>
               <div className="font-display text-2xl text-ember-bright">
-                {(state?.stats.totalEarnings ?? 0).toFixed(3)}
+                {(state?.network?.stats.totalEarnings ?? 0).toFixed(3)}
               </div>
-              <div className="text-[11px] text-ash">0G in royalties</div>
+              <div className="text-[11px] text-ash">0G network royalties</div>
             </div>
           </div>
         </div>
@@ -107,7 +109,13 @@ export default function LibraryPage() {
             </div>
           )}
           {skills.map((s) => (
-            <SkillCard key={s.id} skill={s} onCast={onCast} casting={castingId === s.id} />
+            <SkillCard
+              key={s.id}
+              skill={s}
+              onCast={onCast}
+              casting={castingId === s.id}
+              viewerAddress={isConnected ? address : null}
+            />
           ))}
         </motion.div>
       </main>

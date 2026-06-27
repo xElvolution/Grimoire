@@ -10,11 +10,24 @@ function ago(ts: number): string {
   return `${Math.floor(s / 3600)}h ago`;
 }
 
-export default function RoyaltyFeed({ events }: { events: RoyaltyEvent[] }) {
+export default function RoyaltyFeed({
+  events,
+  walletConnected = true,
+  networkEvents = [],
+}: {
+  events: RoyaltyEvent[];
+  walletConnected?: boolean;
+  networkEvents?: RoyaltyEvent[];
+}) {
+  const showNetwork = !walletConnected && networkEvents.length > 0;
+  const list = walletConnected ? events : networkEvents;
+
   return (
     <div className="rounded-2xl glass p-5">
       <div className="flex items-center justify-between">
-        <h3 className="font-display text-lg text-parchment">Royalty feed</h3>
+        <h3 className="font-display text-lg text-parchment">
+          {walletConnected ? "Your royalty feed" : "Network royalty feed"}
+        </h3>
         <span className="inline-flex items-center gap-1.5 text-[11px] text-emerald">
           <span className="relative flex h-1.5 w-1.5">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald opacity-75" />
@@ -24,14 +37,22 @@ export default function RoyaltyFeed({ events }: { events: RoyaltyEvent[] }) {
         </span>
       </div>
 
+      {!walletConnected && (
+        <p className="mt-2 text-[11px] text-ash">
+          Showing network casts. Connect wallet to track royalties paid to you.
+        </p>
+      )}
+
       <div className="mt-4 space-y-2 max-h-[22rem] overflow-y-auto pr-1">
-        {events.length === 0 && (
+        {list.length === 0 && (
           <p className="text-xs text-ash py-8 text-center">
-            No casts yet. Create a skill, then cast it - royalties land here.
+            {walletConnected
+              ? "No royalties yet. Create a skill, then let agents cast it."
+              : "Connect wallet to earn royalties on skills you create."}
           </p>
         )}
         <AnimatePresence initial={false}>
-          {events.slice(0, 30).map((e) => (
+          {list.slice(0, 30).map((e) => (
             <motion.div
               key={e.id}
               initial={{ opacity: 0, x: -12, height: 0 }}
@@ -72,6 +93,12 @@ export default function RoyaltyFeed({ events }: { events: RoyaltyEvent[] }) {
           ))}
         </AnimatePresence>
       </div>
+
+      {showNetwork && (
+        <p className="mt-3 text-[10px] text-ash/70 text-center">
+          These royalties went to other creators - not your wallet.
+        </p>
+      )}
     </div>
   );
 }

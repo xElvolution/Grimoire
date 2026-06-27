@@ -44,3 +44,6 @@ yarn-debug.log*
 contracts/out/
 contracts/cache/
 contracts/broadcast/
+
+# claude code local settings
+.claude/

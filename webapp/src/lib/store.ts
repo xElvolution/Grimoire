@@ -7,7 +7,7 @@
 
 import fs from "fs";
 import path from "path";
-import type { Skill, Quest, Agent, Creator, RoyaltyEvent, Memory } from "./types";
+import type { Skill, Quest, Agent, Creator, RoyaltyEvent, Memory, Synapse } from "./types";
 
 type DB = {
   skills: Skill[];
@@ -16,6 +16,7 @@ type DB = {
   creators: Creator[];
   royalties: RoyaltyEvent[];
   memories: Memory[];
+  synapses: Synapse[];
 };
 
 const DATA_DIR = path.join(process.cwd(), ".data");
@@ -30,7 +31,20 @@ function seed(): DB {
   const creators: Creator[] = [
     { handle: "you", address: undefined, xp: 0, level: 1, earnings: 0, skillsCreated: 0 },
   ];
-  return { skills: [], quests: [], agents, creators, royalties: [], memories: [] };
+  return { skills: [], quests: [], agents, creators, royalties: [], memories: [], synapses: [] };
+}
+
+function normalize(db: DB): DB {
+  if (!db.memories) db.memories = [];
+  if (!db.synapses) db.synapses = [];
+  for (const m of db.memories) {
+    if (!m.kind) m.kind = "episodic";
+    if (!m.grantedTo) m.grantedTo = [m.agentId];
+  }
+  for (const a of db.agents) {
+    if (!a.linkedAgents) a.linkedAgents = [];
+  }
+  return db;
 }
 
 let cache: DB | null = null;
@@ -39,7 +53,7 @@ function load(): DB {
   if (cache) return cache;
   try {
     if (fs.existsSync(DATA_FILE)) {
-      cache = JSON.parse(fs.readFileSync(DATA_FILE, "utf8")) as DB;
+      cache = normalize(JSON.parse(fs.readFileSync(DATA_FILE, "utf8")) as DB);
       return cache;
     }
   } catch {
@@ -62,6 +76,14 @@ function persist() {
 
 function levelFor(xp: number): number {
   return Math.max(1, Math.floor(Math.sqrt(xp / 100)) + 1);
+}
+
+function normAddr(addr: string) {
+  return addr.toLowerCase();
+}
+
+function matchesAddress(skill: Skill, address: string) {
+  return skill.creatorAddress?.toLowerCase() === normAddr(address);
 }
 
 export const db = {
@@ -94,8 +116,123 @@ export const db = {
   addMemory(m: Memory) {
     const d = load();
     if (!d.memories) d.memories = [];
+    if (!m.kind) m.kind = "episodic";
     d.memories.unshift(m);
+    this.strengthenSynapse(m.id, m.agentId, "owns");
     persist();
+  },
+
+  addFailureMemory(agentId: string, prompt: string, reason: string): Memory {
+    const m: Memory = {
+      id: "fail_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8),
+      agentId,
+      label: "Failure engram",
+      content: `Failed approach for: "${prompt.slice(0, 120)}". Reason: ${reason}`,
+      createdAt: Date.now(),
+      verified: false,
+      grantedTo: [agentId],
+      kind: "failure",
+    };
+    this.addMemory(m);
+    return m;
+  },
+
+  synapses(): Synapse[] {
+    return load().synapses ?? [];
+  },
+
+  getSynapseWeight(from: string, to: string, kind: Synapse["kind"]): number {
+    const s = load().synapses.find((x) => x.from === from && x.to === to && x.kind === kind);
+    return s?.weight ?? 1;
+  },
+
+  strengthenSynapse(from: string, to: string, kind: Synapse["kind"], delta = 0.35) {
+    const d = load();
+    if (!d.synapses) d.synapses = [];
+    let s = d.synapses.find((x) => x.from === from && x.to === to && x.kind === kind);
+    if (!s) {
+      s = { from, to, kind, weight: 1, lastFired: Date.now() };
+      d.synapses.push(s);
+    } else {
+      s.weight = Math.min(10, s.weight + delta);
+      s.lastFired = Date.now();
+    }
+    persist();
+  },
+
+  recordNeuronFire(agentId: string, memoryIds: string[], skillIds: string[]) {
+    for (const mid of memoryIds) {
+      this.strengthenSynapse(mid, agentId, "granted");
+      this.strengthenSynapse(mid, agentId, "owns");
+    }
+    for (const sid of skillIds) {
+      this.strengthenSynapse(sid, agentId, "cast");
+      this.strengthenSynapse("core", sid, "cast", 0.15);
+    }
+    if (memoryIds.length || skillIds.length) {
+      this.strengthenSynapse("core", agentId, "spawned", 0.1);
+    }
+  },
+
+  linkAgents(agentId: string, partnerId: string): Agent | null {
+    const d = load();
+    const a = d.agents.find((x) => x.id === agentId);
+    const p = d.agents.find((x) => x.id === partnerId);
+    if (!a || !p) return null;
+    if (!a.linkedAgents) a.linkedAgents = [];
+    if (!a.linkedAgents.includes(partnerId)) a.linkedAgents.push(partnerId);
+    if (!p.linkedAgents) p.linkedAgents = [];
+    if (!p.linkedAgents.includes(agentId)) p.linkedAgents.push(agentId);
+    this.strengthenSynapse(agentId, partnerId, "linked");
+    this.strengthenSynapse(partnerId, agentId, "linked");
+    // Corpus callosum - grant mutual read on owned memories
+    for (const m of d.memories ?? []) {
+      if (m.agentId === agentId && !m.grantedTo.includes(partnerId)) {
+        m.grantedTo.push(partnerId);
+        this.strengthenSynapse(m.id, partnerId, "granted");
+      }
+      if (m.agentId === partnerId && !m.grantedTo.includes(agentId)) {
+        m.grantedTo.push(agentId);
+        this.strengthenSynapse(m.id, agentId, "granted");
+      }
+    }
+    persist();
+    return a;
+  },
+
+  markMemorySuperseded(id: string): Memory | null {
+    const d = load();
+    const m = (d.memories ?? []).find((x) => x.id === id);
+    if (!m) return null;
+    m.superseded = true;
+    persist();
+    return m;
+  },
+
+  addConsolidatedMemory(
+    episodicId: string,
+    agentId: string,
+    label: string,
+    content: string,
+    id: string,
+    txHash?: string,
+    verified = false
+  ): Memory {
+    const m: Memory = {
+      id,
+      agentId,
+      label,
+      content,
+      createdAt: Date.now(),
+      txHash,
+      verified,
+      grantedTo: [agentId],
+      kind: "semantic",
+      consolidatedFrom: episodicId,
+    };
+    this.addMemory(m);
+    this.markMemorySuperseded(episodicId);
+    return m;
   },
 
   setMemoryAccess(id: string, agentId: string, granted: boolean): Memory | null {
@@ -154,6 +291,7 @@ export const db = {
       createdAt: Date.now(),
     };
     d.agents.push(agent);
+    this.strengthenSynapse("core", agent.id, "spawned");
     persist();
     return agent;
   },
@@ -203,12 +341,15 @@ export const db = {
       skillName: skill.name,
       amount: skill.royaltyPerUse,
       to: skill.creator,
+      toAddress: skill.creatorAddress,
       agentId,
       txHash,
       verified,
       at: Date.now(),
     };
     d.royalties.unshift(ev);
+    this.strengthenSynapse(skillId, agentId, "cast");
+    this.strengthenSynapse("core", skillId, "cast", 0.15);
     persist();
     return ev;
   },
@@ -267,6 +408,61 @@ export const db = {
         d.skills.length === 0
           ? 0
           : d.skills.filter((s) => s.verified).length / d.skills.length,
+    };
+  },
+
+  skillsForAddress(address: string): Skill[] {
+    return load()
+      .skills.filter((s) => matchesAddress(s, address))
+      .sort((a, b) => b.createdAt - a.createdAt);
+  },
+
+  royaltiesForAddress(address: string): RoyaltyEvent[] {
+    const addr = normAddr(address);
+    const d = load();
+    return d.royalties
+      .filter((r) => {
+        if (r.toAddress?.toLowerCase() === addr) return true;
+        const skill = d.skills.find((s) => s.id === r.skillId);
+        return skill ? matchesAddress(skill, address) : false;
+      })
+      .sort((a, b) => b.at - a.at);
+  },
+
+  creatorForAddress(address: string): Creator {
+    const skills = this.skillsForAddress(address);
+    const royalties = this.royaltiesForAddress(address);
+    const earnings = royalties.reduce((s, r) => s + r.amount, 0);
+    const xp = skills.length * 120 + royalties.length * 25;
+    return {
+      handle: `${address.slice(0, 6)}…${address.slice(-4)}`,
+      address,
+      connected: true,
+      xp,
+      level: levelFor(xp),
+      earnings,
+      skillsCreated: skills.length,
+    };
+  },
+
+  emptyCreator(): Creator {
+    return {
+      handle: "",
+      connected: false,
+      xp: 0,
+      level: 1,
+      earnings: 0,
+      skillsCreated: 0,
+    };
+  },
+
+  emptyStats() {
+    return {
+      totalSkills: 0,
+      totalUses: 0,
+      totalEarnings: 0,
+      totalQuests: 0,
+      verifiedShare: 0,
     };
   },
 };

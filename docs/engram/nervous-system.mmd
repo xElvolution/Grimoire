@@ -1,0 +1,28 @@
+flowchart TB
+    subgraph brain["Brain - conscious cognition"]
+        CTX["Cortex: TEE inference / LLM reasoning"]
+        HIP["Hippocampus: Engram commit + consolidation"]
+    end
+
+    subgraph cord["Spinal cord - orchestrator"]
+        OR["Route quest → right agent"]
+        DEC["Decompose goal → sub-tasks"]
+        REF["Reflex: auto-spawn specialist agent"]
+        COORD["Coordinate multi-agent handoffs"]
+    end
+
+    subgraph body["Peripheral system - the economy"]
+        SDK["SDK / API - nerves to the world"]
+        SK["Skills - implicit / procedural memory"]
+        MEM["Memories - explicit / declarative memory"]
+        CHAIN["Chain - property rights + immune system"]
+    end
+
+    SDK --> OR
+    OR --> CTX
+    HIP --> MEM
+    CTX --> SK
+    CHAIN --> MEM
+    CHAIN --> SK
+    OR --> COORD
+    COORD --> CTX

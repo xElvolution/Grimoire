@@ -4,9 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import LogoMark from "./LogoMark";
+import ConnectWallet from "./ConnectWallet";
 
 const LINKS = [
   { href: "/", label: "Dashboard" },
+  { href: "/task", label: "Tasks" },
   { href: "/library", label: "Library" },
   { href: "/memory", label: "Memory" },
   { href: "/market", label: "Market" },
@@ -43,7 +45,10 @@ export default function Nav({ right }: { right?: ReactNode }) {
             })}
           </nav>
         </div>
-        {right}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {right}
+          <ConnectWallet />
+        </div>
       </div>
 
       {/* mobile nav row */}

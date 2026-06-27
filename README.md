@@ -36,6 +36,8 @@ automatically, every single time, with no platform in the middle.
 ## Table of contents
 - [Why it can only exist on 0G](#why-it-can-only-exist-on-0g)
 - [How it works](#how-it-works)
+- [Engram - the AI brain](#engram--the-ai-brain)
+- [What to build & why](#what-to-build--why)
 - [Architecture](#architecture)
 - [Tech stack](#tech-stack)
 - [Getting started](#getting-started)
@@ -80,21 +82,152 @@ A royalty economy needs one thing that is impossible on conventional infrastruct
 4. **You earn forever.** Every future use of that skill, by any agent, pays a royalty to
    the creator - because verified usage makes the payment trustless.
 
+## Engram - the AI brain
+
+Skills are **how** an agent acts. **Engram** is **what** it remembers - a shared,
+portable, verifiable memory layer for agents on 0G Storage, with on-chain access control
+so you truly own (and can revoke) your AI’s mind.
+
+> **Deep dive:** [`docs/engram/README.md`](./docs/engram/README.md) - explicit vs implicit
+> memory, the full nervous system map, roadmap ideas, and
+> [`docs/engram/building-neurons.md`](./docs/engram/building-neurons.md) for how to build
+> neurons in code.
+
+### Explicit vs implicit memory
+
+Human long-term memory splits into two families - Grimoire mirrors both:
+
+| | **Explicit (declarative)** | **Implicit (non-declarative)** |
+| --- | --- | --- |
+| **You…** | Can *say* it | *Do* it without narrating |
+| **Grimoire** | **Engram memories** on 0G | **Skills** (minted procedures) |
+| **Economy** | Pay to **read** (M3) | Pay to **execute** (royalty per cast) |
+
+### The nervous system - not just a brain
+
+| Biology | Grimoire |
+| --- | --- |
+| Cortex | 0G Compute TEE - conscious reasoning |
+| Hippocampus | Engram - commit memory to 0G |
+| **Spinal cord** | **Orchestrator** - route, spawn, handoff (reflexes) |
+| Explicit memory | Engram memories (episodic + semantic) |
+| Implicit memory | Skills (procedural) |
+| Synapses | Grant / revoke + plasticity weight |
+| Peripheral nerves | SDK - plug any agent into the network |
+
+The orchestrator does not "think" - it **routes signals** before TEE inference, like the
+spinal cord handles reflexes before the cortex gets involved.
+
+### Human brain → Grimoire Engram
+
+In neuroscience, an **engram** is the physical trace of a memory - distributed across
+many neurons, not stored in one spot. Grimoire’s Engram applies that model to agents:
+
+| Type | Human example | Grimoire |
+| --- | --- | --- |
+| **Episodic / semantic** | Facts, preferences, events | **Memories** on 0G Storage |
+| **Procedural** | Muscle memory, expertise | **Skills** (minted from solved quests) |
+| **Synapses** | Connections that strengthen with use | **Grant / revoke** between agents and memories |
+| **Forgetting** | Access paths decay | **Revoke on-chain** → the agent loses read access |
+
+Memory lifecycle: **commit** (write to 0G) → **grant** (share synapses) → **retrieve**
+(inject into TEE inference) → **verify** (TEE + storage hashes) → **evolve** (new skills,
+updated reputation).
+
+### Four layers
+
+```mermaid
+flowchart TB
+    subgraph identity["Agent identity (ERC-7857)"]
+        A[AgentRegistry]
+    end
+    subgraph mind["The mind - 0G Storage"]
+        M[Memories - episodic / semantic]
+        S[Skills - procedural]
+    end
+    subgraph access["Access control - on-chain"]
+        MR[MemoryRegistry grant / revoke]
+    end
+    subgraph compute["Inference - 0G Compute TEE"]
+        TEE[Verified skill use + memory retrieval]
+    end
+
+    A -->|"metadata root hash"| mind
+    MR -->|"canRead"| M
+    TEE -->|"reads skills + granted memories"| mind
+```
+
+1. **Identity** (`AgentRegistry`) - ERC-7857 agent ID, metadata root hash pointing to the
+   agent’s mind, specialty, reputation, lineage.
+2. **Storage** (0G) - memories (facts, context) and skills (procedures) as permanent,
+   content-addressed blobs.
+3. **Access** (`MemoryRegistry`) - per-memory grant / revoke; revoke = the agent forgets,
+   enforced on-chain.
+4. **Inference** (0G Compute TEE) - verified skill casts and memory-backed context
+   injection.
+
+The **EngramBrain** visualization on `/memory` maps this literally: agents and memories
+as nodes, synapses as links, pulses as active retrieval. Commit a memory and the neural
+mirror lights up.
+
+### Human vs AI brain (at a glance)
+
+| Dimension | Human brain | Grimoire Engram |
+| --- | --- | --- |
+| Storage | Synaptic weights (distributed) | 0G Storage blobs (content-addressed) |
+| Identity | One body, continuous self | ERC-7857 ID + wallet owner |
+| Verification | Subjective recall | TEE-signed inference + storage hashes |
+| Portability | Stuck in one skull | Portable across agents via 0G |
+| Economy | - | Agents pay for knowledge (M3 roadmap) |
+
+**Mental model:** the full **nervous system** of the agent economy - Engram is memory,
+orchestrator is the spinal cord, TEE is the cortex, chain is property law. Neurons are
+agents, memories, and skills - they **connect, fire, strengthen, and forget**.
+
+→ **Build neurons:** [`docs/engram/building-neurons.md`](./docs/engram/building-neurons.md)
+
+→ **Full build list (~110 items):** [`docs/engram/BUILD.md`](./docs/engram/BUILD.md)
+
+→ **Why we built each thing:** [`docs/engram/WHY.md`](./docs/engram/WHY.md)
+
+## What to build & why
+
+Everything from our Engram neuroscience design, neuron architecture, orchestrator as
+spinal cord, plasticity, failure engrams, consolidation, economy, SDK, and tournament
+roadmap is tracked in two companion docs:
+
+| Doc | Purpose |
+| --- | --- |
+| [`docs/engram/BUILD.md`](./docs/engram/BUILD.md) | **~110 items** - full checklist with ✅ / 🚧 / ⏳ status and phased build order |
+| [`docs/engram/WHY.md`](./docs/engram/WHY.md) | **Rationale for every item** - why it exists (biology → product → 0G wedge) |
+
+**Categories covered:** foundation skill economy · Engram explicit memory · EngramBrain
+visualization · unified neuron model · orchestrator (spinal cord) · synaptic plasticity ·
+failure engrams & consolidation · mind portability on 0G · dual toll booth economy ·
+on-chain identity & trust · SDK & explorers · contract wiring · demo scripts · revenue
+vertical.
+
+**Critical path:** Phase B in BUILD.md - `orchestrator.ts` + `injectContext()` so
+committed memories fire during quests. That is when the brain comes alive.
+
 ## Architecture
 
 A monorepo with four packages:
 
 ```
 0G-agent/
-├── landing/      Marketing site - Next.js 16, Three.js hero, GSAP, Framer Motion
-├── webapp/       The product - the live agent economy + real 0G integration
+├── docs/
+│   └── engram/           BUILD.md, WHY.md, neuroscience, diagrams, neuron guide
+├── landing/              Marketing site - Next.js 16, Three.js hero, GSAP, Framer Motion
+├── webapp/               The product - the live agent economy + real 0G integration
 │   └── src/
-│       ├── app/                  dashboard + API routes (quest, cast, state)
+│       ├── app/                  dashboard, /memory, API routes (quest, cast, state)
 │       ├── lib/zerog/            0G Compute (TEE) + 0G Storage integration
 │       ├── lib/store.ts          economy index (skills, agents, royalties, XP)
-│       └── components/app/       composer, skill cards, royalty feed, counters
-├── sdk/          (planned) the SDK other agents/apps plug into
-└── contracts/    (planned) Solidity - royalty settlement + ERC-7857 identity
+│       ├── components/app/       composer, skill cards, royalty feed, counters
+│       └── components/memory/    EngramBrain neural visualization
+├── sdk/                  the SDK other agents/apps plug into
+└── contracts/            SkillRegistry, AgentRegistry, MemoryRegistry, RoyaltyVault, …
 ```
 
 ## Tech stack
@@ -158,8 +291,9 @@ route handler sets `export const runtime = "nodejs"`.
 ## Roadmap
 
 See [`MILESTONE.md`](./MILESTONE.md) for the full plan. In short: **SDK** (distribution)
-→ **memory economy** (agents pay agents for knowledge) → **reputation markets** and a
-revenue vertical that pays for provable agent skills.
+→ **Engram memory economy** (agents pay agents for knowledge - see
+[`docs/engram`](./docs/engram/README.md)) → **reputation markets** and a revenue vertical
+that pays for provable agent skills.
 
 ## License
 
