@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/store";
 import { uploadJSON } from "@/lib/zerog/storage";
+import { storeMemoryOnChain } from "@/lib/contracts/onchain";
 import type { Memory, MemoryKind } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -63,6 +64,11 @@ export async function POST(req: NextRequest) {
     grantedTo: [agentId],
     kind,
   };
+  if (verified) {
+    const onchain = await storeMemoryOnChain(rootHash, label || "Untitled memory");
+    if (onchain) memory.onChainId = onchain.onChainId;
+  }
+
   db.addMemory(memory);
 
   return NextResponse.json({ memory, verified });

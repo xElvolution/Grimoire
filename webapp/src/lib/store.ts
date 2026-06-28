@@ -7,7 +7,7 @@
 
 import fs from "fs";
 import path from "path";
-import type { Skill, Quest, Agent, Creator, RoyaltyEvent, Memory, Synapse } from "./types";
+import type { Skill, Quest, Agent, Creator, RoyaltyEvent, Memory, Synapse, CreditEntry } from "./types";
 
 type DB = {
   skills: Skill[];
@@ -17,6 +17,8 @@ type DB = {
   royalties: RoyaltyEvent[];
   memories: Memory[];
   synapses: Synapse[];
+  credits: Record<string, number>;
+  creditLedger: CreditEntry[];
 };
 
 const DATA_DIR = path.join(process.cwd(), ".data");
@@ -31,12 +33,14 @@ function seed(): DB {
   const creators: Creator[] = [
     { handle: "you", address: undefined, xp: 0, level: 1, earnings: 0, skillsCreated: 0 },
   ];
-  return { skills: [], quests: [], agents, creators, royalties: [], memories: [], synapses: [] };
+  return { skills: [], quests: [], agents, creators, royalties: [], memories: [], synapses: [], credits: {}, creditLedger: [] };
 }
 
 function normalize(db: DB): DB {
   if (!db.memories) db.memories = [];
   if (!db.synapses) db.synapses = [];
+  if (!db.credits) db.credits = {};
+  if (!db.creditLedger) db.creditLedger = [];
   for (const m of db.memories) {
     if (!m.kind) m.kind = "episodic";
     if (!m.grantedTo) m.grantedTo = [m.agentId];
@@ -312,20 +316,24 @@ export const db = {
     persist();
   },
 
-  /** Record a verified skill use: bump uses, pay the creator a royalty, award agent XP. */
-  recordUse(skillId: string, agentId: string, txHash: string | undefined, verified: boolean): RoyaltyEvent | null {
+  /** Record a skill use: bump uses, pay royalty to creator (unless self-use), award agent XP. */
+  recordUse(
+    skillId: string,
+    agentId: string,
+    txHash: string | undefined,
+    verified: boolean,
+    opts?: { callerAddress?: string }
+  ): RoyaltyEvent | null {
     const d = load();
     const skill = d.skills.find((s) => s.id === skillId);
     if (!skill) return null;
-    skill.uses += 1;
-    skill.earnings += skill.royaltyPerUse;
 
-    const creator = d.creators.find((c) => c.handle === skill.creator);
-    if (creator) {
-      creator.earnings += skill.royaltyPerUse;
-      creator.xp += 25;
-      creator.level = levelFor(creator.xp);
-    }
+    const selfUse =
+      !!opts?.callerAddress &&
+      !!skill.creatorAddress &&
+      normAddr(opts.callerAddress) === normAddr(skill.creatorAddress);
+
+    skill.uses += 1;
 
     const agent = d.agents.find((a) => a.id === agentId);
     if (agent) {
@@ -333,6 +341,22 @@ export const db = {
       agent.questsSolved += 1;
       agent.level = levelFor(agent.xp);
       agent.reputation = Math.min(100, agent.reputation + 1);
+    }
+
+    if (selfUse) {
+      this.strengthenSynapse(skillId, agentId, "cast");
+      this.strengthenSynapse("core", skillId, "cast", 0.15);
+      persist();
+      return null;
+    }
+
+    skill.earnings += skill.royaltyPerUse;
+
+    const creator = d.creators.find((c) => c.handle === skill.creator);
+    if (creator) {
+      creator.earnings += skill.royaltyPerUse;
+      creator.xp += 25;
+      creator.level = levelFor(creator.xp);
     }
 
     const ev: RoyaltyEvent = {
@@ -454,6 +478,92 @@ export const db = {
       earnings: 0,
       skillsCreated: 0,
     };
+  },
+
+  getCredits(address: string): number {
+    return load().credits[normAddr(address)] ?? 0;
+  },
+
+  ensureCredits(address: string, bonus = 0): number {
+    const d = load();
+    const key = normAddr(address);
+    if (d.credits[key] === undefined) {
+      d.credits[key] = bonus;
+      persist();
+    }
+    return d.credits[key];
+  },
+
+  addCredits(address: string, amount: number, meta?: { txHash?: string; note?: string }): number {
+    const d = load();
+    const key = normAddr(address);
+    d.credits[key] = (d.credits[key] ?? 0) + amount;
+    d.creditLedger.unshift({
+      id: `cr-${Date.now()}`,
+      address: key,
+      type: "fund",
+      amount,
+      balanceAfter: d.credits[key],
+      note: meta?.note ?? "Funded balance",
+      txHash: meta?.txHash,
+      at: Date.now(),
+    });
+    persist();
+    return d.credits[key];
+  },
+
+  deductCredits(
+    address: string,
+    amount: number,
+    meta?: { note?: string; mode?: string; questId?: string }
+  ): boolean {
+    const d = load();
+    const key = normAddr(address);
+    const bal = d.credits[key] ?? 0;
+    if (bal < amount) return false;
+    d.credits[key] = bal - amount;
+    d.creditLedger.unshift({
+      id: `db-${Date.now()}`,
+      address: key,
+      type: "debit",
+      amount,
+      balanceAfter: d.credits[key],
+      note: meta?.note ?? "Task",
+      mode: meta?.mode,
+      questId: meta?.questId,
+      at: Date.now(),
+    });
+    persist();
+    return true;
+  },
+
+  refundCredits(
+    address: string,
+    amount: number,
+    meta?: { note?: string; questId?: string }
+  ): number {
+    const d = load();
+    const key = normAddr(address);
+    d.credits[key] = (d.credits[key] ?? 0) + amount;
+    d.creditLedger.unshift({
+      id: `rf-${Date.now()}`,
+      address: key,
+      type: "refund",
+      amount,
+      balanceAfter: d.credits[key],
+      note: meta?.note ?? "Refund",
+      questId: meta?.questId,
+      at: Date.now(),
+    });
+    persist();
+    return d.credits[key];
+  },
+
+  creditLedgerForAddress(address: string, limit = 30): CreditEntry[] {
+    const key = normAddr(address);
+    return load()
+      .creditLedger.filter((e) => e.address === key)
+      .slice(0, limit);
   },
 
   emptyStats() {

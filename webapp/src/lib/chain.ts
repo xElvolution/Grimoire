@@ -19,3 +19,8 @@ export const zerogGalileo = defineChain({
 export function shortAddress(addr: string) {
   return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
 }
+
+/** Protocol treasury - receives credit deposits (matches server PRIVATE_KEY wallet). */
+export const CREDIT_TREASURY =
+  process.env.NEXT_PUBLIC_CREDIT_TREASURY ||
+  "0xe6A9c7B4e791199C58B3e88526e04e166294580A";

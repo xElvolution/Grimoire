@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import type { Skill } from "@/lib/types";
 import { RARITY_META } from "@/lib/skills";
@@ -15,13 +16,9 @@ const RARITY_RING: Record<string, string> = {
 
 export default function SkillCard({
   skill,
-  onCast,
-  casting,
   viewerAddress,
 }: {
   skill: Skill;
-  onCast: (id: string) => void;
-  casting: boolean;
   viewerAddress?: string | null;
 }) {
   const rarity = RARITY_META[skill.rarity];
@@ -57,43 +54,44 @@ export default function SkillCard({
 
       <p className="mt-2 text-xs text-ash line-clamp-2">{skill.description}</p>
 
-      <div className="mt-4 flex items-center justify-between text-xs">
-        <div className="flex items-center gap-4">
-          <div>
-            <div className="font-mono text-parchment">
-              <Counter value={skill.uses} />
-            </div>
-            <div className="text-[10px] text-ash">uses</div>
+      <div className="mt-4 flex items-center gap-6 text-xs">
+        <div>
+          <div className="font-mono text-parchment">
+            <Counter value={skill.uses} />
           </div>
-          <div>
-            <div className="font-mono text-ember-bright">
-              <Counter value={skill.earnings} decimals={3} suffix=" 0G" />
-            </div>
-            <div className="text-[10px] text-ash">
-              earned by {skillCreatorLabel(skill, viewerAddress)}
-            </div>
+          <div className="text-[10px] text-ash">times used</div>
+        </div>
+        <div>
+          <div className="font-mono text-ember-bright">
+            <Counter value={skill.earnings} decimals={3} suffix=" 0G" />
           </div>
+          <div className="text-[10px] text-ash">
+            earned by {skillCreatorLabel(skill, viewerAddress)}
+          </div>
+        </div>
+        <div>
+          <div className="font-mono text-mana">{skill.royaltyPerUse} 0G</div>
+          <div className="text-[10px] text-ash">per use</div>
         </div>
       </div>
 
-      <div className="mt-4 flex items-center justify-between">
-        <span className="font-mono text-[10px] text-ash/60 truncate max-w-[55%]">
+      <div className="mt-4 flex items-center justify-between gap-2">
+        <span className="font-mono text-[10px] text-ash/60 truncate">
           {skill.creatorAddress
             ? skill.creatorAddress.slice(0, 10) + "…" + skill.creatorAddress.slice(-4)
             : skill.id.slice(0, 10) + "…"}
         </span>
-        <button
-          onClick={() => onCast(skill.id)}
-          disabled={casting}
-          className="rounded-lg bg-gradient-to-r from-arcane to-arcane-deep px-3 py-1.5 text-xs font-medium text-white hover:opacity-90 disabled:opacity-50 transition"
+        <Link
+          href="/library"
+          className="text-[11px] text-mana hover:text-parchment transition"
         >
-          {casting ? "Casting…" : `Cast (+${skill.royaltyPerUse} 0G)`}
-        </button>
+          View in library →
+        </Link>
       </div>
 
       {owned && (
         <span className="mt-2 inline-block rounded-full bg-ember/10 border border-ember/30 px-2 py-0.5 text-[9px] text-ember-bright">
-          your skill
+          your skill · earns when others use it on tasks
         </span>
       )}
     </motion.div>

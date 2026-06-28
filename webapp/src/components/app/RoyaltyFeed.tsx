@@ -39,7 +39,7 @@ export default function RoyaltyFeed({
 
       {!walletConnected && (
         <p className="mt-2 text-[11px] text-ash">
-          Showing network casts. Connect wallet to track royalties paid to you.
+          Showing when someone uses a skill on the network. Sign in to see royalties paid to you.
         </p>
       )}
 
@@ -47,8 +47,8 @@ export default function RoyaltyFeed({
         {list.length === 0 && (
           <p className="text-xs text-ash py-8 text-center">
             {walletConnected
-              ? "No royalties yet. Create a skill, then let agents cast it."
-              : "Connect wallet to earn royalties on skills you create."}
+              ? "No royalties yet. Create a skill, then others can use it and pay you."
+              : "Sign in to earn when others use your skills."}
           </p>
         )}
         <AnimatePresence initial={false}>
@@ -62,7 +62,7 @@ export default function RoyaltyFeed({
             >
               <div className="min-w-0">
                 <div className="text-xs text-parchment truncate">
-                  <span className="text-arcane-bright">{e.agentId}</span> cast{" "}
+                  <span className="text-arcane-bright">{e.agentId}</span> used{" "}
                   <span className="text-ash">{e.skillName}</span>
                 </div>
                 <div className="text-[10px] text-ash/60">

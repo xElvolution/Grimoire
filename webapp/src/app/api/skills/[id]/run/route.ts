@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/store";
 import { solve } from "@/lib/zerog/engine";
-import { payRoyalty } from "@/lib/zerog/payments";
+import { settleSkillUse } from "@/lib/contracts/onchain";
 import { injectContext, retrieveMemories } from "@/lib/orchestrator";
 import { publishMindManifest } from "@/lib/mind";
 
@@ -16,6 +16,10 @@ export async function POST(
   const { id } = await params;
   const body = await req.json().catch(() => ({}));
   const agentId: string = body.agentId || "lyra";
+  const callerAddress: string | undefined =
+    typeof body.callerAddress === "string" && /^0x[a-fA-F0-9]{40}$/.test(body.callerAddress)
+      ? body.callerAddress
+      : undefined;
 
   const skill = db.getSkill(id);
   if (!skill) {
@@ -44,12 +48,20 @@ export async function POST(
 
   db.recordNeuronFire(agentId, firedMemoryIds, [skill.id]);
 
+  const selfUse =
+    !!callerAddress &&
+    !!skill.creatorAddress &&
+    callerAddress.toLowerCase() === skill.creatorAddress.toLowerCase();
+
   let onchain: { txHash: string; url: string } | null = null;
-  if (result.verified && !result.simulated && skill.creatorAddress) {
-    onchain = await payRoyalty(skill.creatorAddress, skill.royaltyPerUse);
+  if (result.verified && !result.simulated && skill.creatorAddress && !selfUse) {
+    const settled = await settleSkillUse(skill.id, skill.royaltyPerUse, skill.creatorAddress);
+    if (settled) onchain = settled;
   }
 
-  const royalty = db.recordUse(id, agentId, onchain?.txHash, result.verified);
+  const royalty = db.recordUse(id, agentId, onchain?.txHash, result.verified, {
+    callerAddress,
+  });
 
   const agent = db.getAgent(agentId);
   if (agent) {

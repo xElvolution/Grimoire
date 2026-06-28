@@ -1,12 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import Nav from "@/components/app/Nav";
 import { fetchMarket, marketAction, type MarketState } from "@/lib/client";
+import { useGrimoireWallet } from "@/lib/wallet";
+import { skillIsOwnedBy } from "@/lib/skillOwner";
 import { RARITY_META } from "@/lib/skills";
 
 export default function MarketPage() {
+  const { address, isConnected } = useGrimoireWallet();
   const [state, setState] = useState<MarketState | null>(null);
   const [price, setPrice] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState<string | null>(null);
@@ -39,7 +42,13 @@ export default function MarketPage() {
   }
 
   const listings = state?.listings ?? [];
-  const owned = (state?.skills ?? []).filter((s) => s.creator === "you" && !s.forSale);
+  const owned = useMemo(
+    () =>
+      (state?.skills ?? []).filter(
+        (s) => isConnected && skillIsOwnedBy(s, address) && !s.forSale
+      ),
+    [state?.skills, isConnected, address]
+  );
 
   return (
     <div className="min-h-screen bg-runic-grid">
@@ -51,7 +60,6 @@ export default function MarketPage() {
           Settled on-chain by the <span className="text-arcane-bright">SkillMarketplace</span> contract.
         </p>
 
-        {/* listings */}
         <h2 className="mt-8 font-display text-xl text-parchment">For sale</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {listings.length === 0 && (
@@ -75,23 +83,27 @@ export default function MarketPage() {
               <div className="mt-4 flex items-center justify-between">
                 <span className="font-mono text-ember-bright">{s.price} 0G</span>
                 <button
-                  onClick={() => act("buy", s.id, { buyer: "you" })}
-                  disabled={busy === s.id}
+                  onClick={() => act("buy", s.id, { buyer: address ?? "you" })}
+                  disabled={busy === s.id || skillIsOwnedBy(s, address)}
                   className="rounded-lg bg-gradient-to-r from-ember-bright to-ember px-4 py-1.5 text-xs font-medium text-void disabled:opacity-50"
                 >
-                  {busy === s.id ? "…" : "Buy"}
+                  {skillIsOwnedBy(s, address) ? "Yours" : busy === s.id ? "…" : "Buy"}
                 </button>
               </div>
             </motion.div>
           ))}
         </div>
 
-        {/* your skills */}
         <h2 className="mt-10 font-display text-xl text-parchment">Your skills</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {owned.length === 0 && (
+          {!isConnected && (
             <div className="sm:col-span-2 lg:col-span-3 rounded-2xl glass p-10 text-center text-sm text-ash">
-              You don&apos;t own any unlisted skills. Mint one on the dashboard.
+              Sign in to see skills you can list for sale.
+            </div>
+          )}
+          {isConnected && owned.length === 0 && (
+            <div className="sm:col-span-2 lg:col-span-3 rounded-2xl glass p-10 text-center text-sm text-ash">
+              You don&apos;t own any unlisted skills. Mint one from a task on the dashboard.
             </div>
           )}
           {owned.map((s) => (

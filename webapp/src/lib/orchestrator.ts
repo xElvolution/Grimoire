@@ -209,3 +209,36 @@ export function injectContext(
   parts.push("=== Task ===", prompt.trim());
   return parts.join("\n\n");
 }
+
+/** Wallet context for trade, balance-aware, and on-chain tasks. */
+export function injectWalletContext(prompt: string, walletBlock: string): string {
+  if (!walletBlock.trim()) return prompt.trim();
+  return `=== Connected wallet (0G Galileo) ===\n${walletBlock}\n\n=== Task ===\n${prompt.trim()}`;
+}
+
+/** User-facing task text when a prompt includes injected memory/skill blocks. */
+export function extractTaskPrompt(enriched: string): string {
+  const marker = "=== Task ===";
+  const idx = enriched.indexOf(marker);
+  if (idx >= 0) return enriched.slice(idx + marker.length).trim();
+  return enriched.trim();
+}
+
+/** Strip internal injection headers if they leaked into a model answer. */
+export function formatUserFacingAnswer(answer: string): string {
+  if (/=== Connected wallet/.test(answer)) {
+    const task = extractTaskPrompt(answer);
+    if (task && !task.startsWith("===")) return task;
+  }
+  if (!/=== (Explicit memory|Procedural context|Task|Connected wallet) ===/.test(answer)) {
+    return answer;
+  }
+  const task = extractTaskPrompt(answer);
+  if (task && !task.startsWith("===")) return task;
+  return answer
+    .replace(/=== Connected wallet \(0G Galileo\) ===[\s\S]*?(?=\n\n===|$)/, "")
+    .replace(/=== Explicit memory \(engrams\) ===[\s\S]*?(?=\n\n===|$)/, "")
+    .replace(/=== Procedural context \(skills\) ===[\s\S]*?(?=\n\n===|$)/, "")
+    .replace(/^=== Task ===\n?/, "")
+    .trim();
+}

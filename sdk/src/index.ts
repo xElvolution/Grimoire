@@ -1,46 +1,20 @@
 /**
- * @grimoire/sdk
- *
- * The TypeScript SDK for Grimoire - the verifiable economy of AI agents on 0G.
- * Any app or agent can use this to create skills, use existing skills, and earn
- * (or pay) royalties. Skills are executed on 0G Compute (TEE-verified) and stored
- * permanently on 0G Storage; verified usage pays the skill's creator automatically.
- *
- * @example
- * ```ts
- * import { GrimoireClient } from "@grimoire/sdk";
- *
- * const grimoire = new GrimoireClient({ baseUrl: "https://grimoire.app" });
- *
- * // 1. Solve a task -> a reusable, owned skill is minted on 0G
- * const { skill } = await grimoire.createSkill("Summarize a DeFi protocol's risks");
- *
- * // 2. Any agent can use that skill -> the creator earns a royalty, verified by 0G
- * const { royalty } = await grimoire.useSkill(skill.id, { agentId: "lyra" });
- * console.log(`Paid ${royalty?.amount} 0G to ${royalty?.to}`);
- * ```
+ * @grimoire/sdk - TypeScript client for the Grimoire agent economy on 0G.
  */
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
 
 export type Rarity = "common" | "rare" | "epic" | "legendary";
 
 export interface Skill {
-  /** Permanent 0G Storage root hash - the skill's identifier. */
   id: string;
   name: string;
   description: string;
   category: string;
-  /** The reusable recipe (prompt/method) the skill replays. */
   promptTemplate: string;
   sampleOutput: string;
   creator: string;
   creatorAddress?: string;
   model: string;
   provider: string;
-  /** True when the skill was produced inside a 0G Compute TEE. */
   verified: boolean;
   rarity: Rarity;
   uses: number;
@@ -53,7 +27,6 @@ export interface Skill {
 export interface Agent {
   id: string;
   name: string;
-  /** ERC-7857 Agentic ID. */
   erc7857: string;
   specialty: string;
   level: number;
@@ -76,40 +49,32 @@ export interface RoyaltyEvent {
   at: number;
 }
 
-export interface SpawnedAgent {
+export interface Quest {
   id: string;
-  name: string;
-  specialty: string;
-  erc7857: string;
-  by?: string;
+  prompt: string;
+  answer?: string;
+  status: string;
+  verified?: boolean;
+  mode?: string;
+  artifact?: { type: string; content: string; language?: string };
+  creditCost?: number;
 }
 
-export interface CreateSkillResult {
-  skill: Skill;
-  spawnedAgent: SpawnedAgent | null;
-  /** True if the run fell back to simulation (wallet not funded). */
+export interface TaskResult {
+  quest: Quest;
+  skill: Skill | null;
+  skillMinted: boolean;
   simulated: boolean;
-  note?: string;
-}
-
-export interface UseSkillResult {
-  ok: boolean;
-  result: {
-    verified: boolean;
-    simulated: boolean;
-    provider: string;
-    model: string;
-    answer: string;
-  };
-  royalty: RoyaltyEvent | null;
-  /** On-chain settlement, present when a verified use paid a real royalty. */
-  onchain: { txHash: string; url: string } | null;
+  credits?: number;
+  onchain?: { txHash: string; url: string } | null;
+  artifact?: Quest["artifact"];
 }
 
 export interface GrimoireState {
   skills: Skill[];
   agents: Agent[];
   royalties: RoyaltyEvent[];
+  credits?: number;
   stats: {
     totalSkills: number;
     totalUses: number;
@@ -119,16 +84,16 @@ export interface GrimoireState {
   };
 }
 
-export interface GrimoireConfig {
-  /** Base URL of a Grimoire deployment. Defaults to http://localhost:3000. */
-  baseUrl?: string;
-  /** Optional custom fetch (e.g. for Node < 18 or testing). */
-  fetch?: typeof fetch;
+export interface CreditState {
+  balance: number;
+  treasury: string;
+  signupBonus: number;
 }
 
-// ---------------------------------------------------------------------------
-// Client
-// ---------------------------------------------------------------------------
+export interface GrimoireConfig {
+  baseUrl?: string;
+  fetch?: typeof fetch;
+}
 
 export class GrimoireError extends Error {
   constructor(message: string, readonly status?: number) {
@@ -144,84 +109,73 @@ export class GrimoireClient {
   constructor(config: GrimoireConfig = {}) {
     this.baseUrl = (config.baseUrl ?? "http://localhost:3000").replace(/\/$/, "");
     const f = config.fetch ?? globalThis.fetch;
-    if (!f) {
-      throw new GrimoireError(
-        "No fetch implementation found. Pass `fetch` in the config (Node < 18)."
-      );
-    }
+    if (!f) throw new GrimoireError("No fetch - pass fetch in config.");
     this._fetch = f.bind(globalThis);
   }
 
-  /**
-   * Solve a task on 0G Compute and mint the resulting method as a reusable Skill,
-   * stored on 0G Storage and owned by the creator.
-   */
+  /** Post a task (primary API - skills used automatically by orchestrator). */
+  async createTask(
+    prompt: string,
+    opts: {
+      mode?: string;
+      bounty?: number;
+      agentId?: string;
+      creatorAddress: string;
+    }
+  ): Promise<TaskResult> {
+    return this.post("/api/quest", {
+      prompt,
+      mode: opts.mode ?? "ask",
+      bounty: opts.bounty ?? 0,
+      agentId: opts.agentId ?? "auto",
+      creatorAddress: opts.creatorAddress,
+    });
+  }
+
+  /** @deprecated Use createTask - skills run via orchestrator, not manually. */
   async createSkill(
     prompt: string,
     opts: { bounty?: number; agentId?: string; creator?: string } = {}
-  ): Promise<CreateSkillResult> {
-    return this.post<CreateSkillResult>("/api/quest", {
-      prompt,
-      bounty: opts.bounty ?? 0,
-      agentId: opts.agentId ?? "auto",
-      creator: opts.creator ?? "you",
+  ) {
+    return this.createTask(prompt, {
+      creatorAddress: opts.creator ?? "",
+      agentId: opts.agentId,
+      bounty: opts.bounty,
     });
   }
 
-  /**
-   * Use an existing skill. The run is verified on 0G Compute; on a verified use,
-   * a royalty is paid to the skill's creator.
-   */
-  async useSkill(
-    skillId: string,
-    opts: { agentId?: string } = {}
-  ): Promise<UseSkillResult> {
-    return this.post<UseSkillResult>(`/api/skills/${skillId}/run`, {
-      agentId: opts.agentId ?? "lyra",
-    });
+  async getCredits(address: string): Promise<CreditState> {
+    return this.get(`/api/credits?address=${address}`);
   }
 
-  /** List every skill in the Grimoire, sorted by usage. */
+  async fundCredits(address: string, amount: number, txHash?: string) {
+    return this.post("/api/credits", { address, amount, txHash });
+  }
+
   async listSkills(): Promise<Skill[]> {
     return (await this.getState()).skills;
   }
 
-  /** The full economy snapshot: skills, agents, royalty feed, and aggregate stats. */
-  async getState(): Promise<GrimoireState> {
-    return this.get<GrimoireState>("/api/state");
+  async getState(walletAddress?: string): Promise<GrimoireState> {
+    const qs = walletAddress ? `?address=${walletAddress}` : "";
+    return this.get(`/api/state${qs}`);
   }
 
-  /** Neuron graph + brain health scan. */
-  async getBrain(): Promise<{
-    graph: unknown;
-    synapses: unknown[];
-    health: unknown[];
-    stats: Record<string, number>;
-  }> {
+  async getBrain() {
     return this.get("/api/brain");
   }
 
-  /** Commit explicit memory to Engram (0G Storage). */
-  async writeMemory(
-    agentId: string,
-    label: string,
-    content: string,
-    kind?: string
-  ): Promise<{ memory: unknown; verified: boolean }> {
+  async writeMemory(agentId: string, label: string, content: string, kind?: string) {
     return this.post("/api/memory", { agentId, label, content, kind });
   }
 
-  /** Consolidate episodic → semantic memory. */
   async consolidateMemory(memoryId?: string, agentId?: string) {
     return this.post("/api/memory/consolidate", { memoryId, agentId });
   }
 
-  /** Link two agents (corpus callosum - shared explicit memory). */
   async linkAgents(agentId: string, partnerId: string) {
     return this.post("/api/memory/link", { agentId, partnerId });
   }
-
-  // -- internals ------------------------------------------------------------
 
   private async get<T>(path: string): Promise<T> {
     const res = await this._fetch(`${this.baseUrl}${path}`, {
@@ -241,9 +195,7 @@ export class GrimoireClient {
 
   private async handle<T>(res: Response): Promise<T> {
     const data = (await res.json().catch(() => ({}))) as T & { error?: string };
-    if (!res.ok) {
-      throw new GrimoireError(data?.error ?? `Request failed (${res.status})`, res.status);
-    }
+    if (!res.ok) throw new GrimoireError(data?.error ?? `Request failed (${res.status})`, res.status);
     return data as T;
   }
 }

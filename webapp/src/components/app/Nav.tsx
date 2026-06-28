@@ -28,7 +28,10 @@ export default function Nav({ right }: { right?: ReactNode }) {
           </Link>
           <nav className="hidden sm:flex items-center gap-1">
             {LINKS.map((l) => {
-              const active = l.href === "/" ? path === "/" : path.startsWith(l.href);
+              const active =
+                l.href === "/"
+                  ? path === "/"
+                  : path === l.href || path.startsWith(l.href + "/");
               return (
                 <Link
                   key={l.href}
@@ -51,10 +54,12 @@ export default function Nav({ right }: { right?: ReactNode }) {
         </div>
       </div>
 
-      {/* mobile nav row */}
       <nav className="sm:hidden flex items-center gap-1 overflow-x-auto px-4 pb-2">
         {LINKS.map((l) => {
-          const active = l.href === "/" ? path === "/" : path.startsWith(l.href);
+          const active =
+            l.href === "/"
+              ? path === "/"
+              : path === l.href || path.startsWith(l.href + "/");
           return (
             <Link
               key={l.href}

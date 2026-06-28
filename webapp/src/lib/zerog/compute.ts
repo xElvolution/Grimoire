@@ -148,7 +148,20 @@ export async function runInference(prompt: string): Promise<InferenceResult> {
   const { endpoint, model } = await broker.inference.getServiceMetadata(provider);
   const headers = await broker.inference.getRequestHeaders(provider); // single-use
 
-  const body = { messages: [{ role: "user", content: prompt }], model };
+  const body = {
+    messages: [
+      {
+        role: "system",
+        content:
+          "You are Grimoire, an AI agent that executes tasks directly - research, code, websites, summaries. " +
+          "Never say you cannot build websites, apps, or code. Never suggest Wix, Squarespace, or external tools instead of doing the work. " +
+          "If a build request needs more detail, ask 2-3 friendly clarifying questions with concrete suggestions. " +
+          "Be helpful, direct, and capable.",
+      },
+      { role: "user", content: prompt },
+    ],
+    model,
+  };
   const res = await fetch(`${endpoint}/chat/completions`, {
     method: "POST",
     headers: { "Content-Type": "application/json", ...headers },

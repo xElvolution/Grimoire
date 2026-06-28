@@ -15,6 +15,7 @@ import {
   type MemoryState,
   type BrainState,
 } from "@/lib/client";
+import { memoryKindLabel } from "@/lib/memoryLabels";
 
 const GrimoireBrain = dynamic(() => import("@/components/brain/GrimoireBrain"), {
   ssr: false,
@@ -115,22 +116,11 @@ export default function MemoryPage() {
       <main className="mx-auto max-w-6xl px-4 sm:px-6 py-8">
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
           <div>
-            <h1 className="font-display text-3xl text-parchment">Engram</h1>
+            <h1 className="font-display text-3xl text-parchment">Memory</h1>
             <p className="mt-1 text-sm text-ash max-w-xl">
-              The shared brain of your agents - memories on 0G Storage, access
-              controlled synapse by synapse. Revoke and the agent forgets.
+              Notes your agents can read when solving tasks. Saved on 0G. Remove access
+              and they stop using that note.
             </p>
-          </div>
-          <div className="flex flex-wrap gap-3 text-[10px] text-ash">
-            <span className="flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-mana" /> agent node
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-emerald" /> verified memory
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-ember-bright" /> engram core
-            </span>
           </div>
         </div>
 
@@ -148,9 +138,9 @@ export default function MemoryPage() {
         <div className="mt-6 grid gap-6 lg:grid-cols-5">
           {/* write panel */}
           <div className="lg:col-span-2 rounded-2xl glass rune-border p-6">
-            <h2 className="font-display text-lg text-parchment">Commit memory</h2>
+            <h2 className="font-display text-lg text-parchment">Save a note</h2>
             <p className="mt-1 text-[11px] text-ash">
-              Writes permanently to 0G Storage and lights a new node in the brain.
+              Pick an agent and write what it should remember for future tasks.
             </p>
             <div className="mt-4 flex flex-wrap items-center gap-3">
             <label className="flex items-center gap-2 text-xs text-ash">
@@ -170,24 +160,24 @@ export default function MemoryPage() {
             <input
               value={label}
               onChange={(e) => setLabel(e.target.value)}
-              placeholder="label (e.g. user preferences)"
+              placeholder="Title (e.g. User preferences)"
               className="flex-1 min-w-[10rem] rounded-lg border border-white/10 bg-void/60 px-3 py-1.5 text-sm text-parchment outline-none placeholder:text-ash/40 focus:border-arcane/60"
             />
             <label className="flex items-center gap-2 text-xs text-ash">
-              Kind
+              Type
               <select
                 value={memoryKind}
                 onChange={(e) => setMemoryKind(e.target.value as typeof memoryKind)}
                 className="rounded-lg border border-white/10 bg-void/60 px-2 py-1.5 text-parchment outline-none"
               >
-                <option value="preference">preference (explicit)</option>
-                <option value="episodic">episodic</option>
-                <option value="semantic">semantic</option>
+                <option value="preference">Preference</option>
+                <option value="episodic">Story / event</option>
+                <option value="semantic">Fact</option>
               </select>
             </label>
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-ash">
-            <span>Corpus callosum - link agents:</span>
+            <span>Share notes with another agent:</span>
             <select
               value={linkPartner}
               onChange={(e) => setLinkPartner(e.target.value)}
@@ -204,7 +194,7 @@ export default function MemoryPage() {
               onClick={doLink}
               className="rounded-lg border border-mana/30 px-2 py-1 text-mana hover:bg-mana/10"
             >
-              Link synapses
+              Share access
             </button>
           </div>
           <textarea
@@ -220,7 +210,7 @@ export default function MemoryPage() {
               disabled={saving || content.trim().length < 3}
               className="rounded-xl bg-gradient-to-r from-ember-bright to-ember px-6 py-2.5 text-sm font-medium text-void hover:scale-[1.02] disabled:opacity-50 transition"
             >
-              {saving ? "Writing to 0G…" : "Commit to memory"}
+              {saving ? "Saving…" : "Save note"}
             </button>
           </div>
         </div>
@@ -229,7 +219,7 @@ export default function MemoryPage() {
           <div className="lg:col-span-3 space-y-3">
             {memories.length === 0 && (
               <div className="rounded-2xl glass p-10 text-center text-sm text-ash">
-                No memories yet. Commit one - the neural mirror will wake up.
+                No notes yet. Save one above - it will be used on future tasks.
             </div>
           )}
           <AnimatePresence initial={false}>
@@ -254,7 +244,7 @@ export default function MemoryPage() {
                       </span>
                       {m.verified ? (
                         <span className="rounded-full bg-emerald/10 border border-emerald/30 px-2 py-0.5 text-[10px] text-emerald">
-                          ✓ on 0G
+                          ✓ saved on 0G
                         </span>
                       ) : (
                         <span className="rounded-full bg-white/5 border border-white/10 px-2 py-0.5 text-[10px] text-ash">
@@ -263,17 +253,17 @@ export default function MemoryPage() {
                       )}
                       {m.kind && (
                         <span className="rounded-full bg-arcane/10 border border-arcane/30 px-2 py-0.5 text-[10px] text-arcane-bright">
-                          {m.kind}
+                          {memoryKindLabel(m.kind)}
                         </span>
                       )}
                       {m.superseded && (
                         <span className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] text-ash">
-                          superseded
+                          replaced by summary
                         </span>
                       )}
                     </div>
                     <div className="text-[11px] text-ash">
-                        synapse owned by {agentName(m.agentId)}
+                        Saved by {agentName(m.agentId)}
                       </div>
                   </div>
                   {m.txHash && (
@@ -305,14 +295,14 @@ export default function MemoryPage() {
                       }}
                       className="rounded-full px-2.5 py-1 text-[11px] border border-ember/30 text-ember-bright hover:bg-ember/10"
                     >
-                      Consolidate → semantic
+                      Summarize to a short fact
                     </button>
                   )}
                 </div>
 
                 <div className="mt-3 border-t hairline pt-3">
                   <div className="text-[11px] text-ash mb-2">
-                      Read access - grant / revoke synapses:
+                      Which agents can read this?
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {agents.map((a) => {

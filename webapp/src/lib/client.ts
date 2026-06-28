@@ -1,4 +1,4 @@
-import type { Skill, Quest, Agent, Creator, RoyaltyEvent, Memory, Synapse } from "./types";
+import type { Skill, Quest, Agent, Creator, RoyaltyEvent, Memory, Synapse, CreditEntry } from "./types";
 
 export type GrimoireState = {
   walletConnected: boolean;
@@ -7,6 +7,7 @@ export type GrimoireState = {
   agents: Agent[];
   royalties: RoyaltyEvent[];
   creator: Creator;
+  credits?: number;
   stats: {
     totalSkills: number;
     totalUses: number;
@@ -48,20 +49,55 @@ export type QuestResponse = {
   firedSkills?: Skill[];
   castSkill?: Skill | null;
   reflex?: string;
-  onchain?: { txHash: string; url: string } | null;
+  onchain?: { txHash: string; url: string; method?: string } | null;
+  credits?: number;
+  creditUsed?: number;
+  ledger?: CreditEntry[];
+  artifact?: Quest["artifact"];
   error?: string;
+  directTask?: "balance" | "earnings" | "my-skills" | "trade-info";
 };
+
+export type CreditState = {
+  balance: number;
+  treasury: string;
+  signupBonus: number;
+  ledger?: CreditEntry[];
+};
+
+export async function fetchCredits(address: string): Promise<CreditState> {
+  const r = await fetch(`/api/credits?address=${address}`, { cache: "no-store" });
+  const data = await r.json();
+  if (!r.ok) throw new Error(data?.error || "Failed to load credits");
+  return data;
+}
+
+export async function fundCredits(
+  address: string,
+  amount: number,
+  txHash?: string
+): Promise<CreditState & { balance: number; credited?: number; ledger?: CreditEntry[] }> {
+  const r = await fetch("/api/credits", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ address, amount, txHash }),
+  });
+  const data = await r.json();
+  if (!r.ok) throw new Error(data?.error || "Fund failed");
+  return data;
+}
 
 export async function postQuest(
   prompt: string,
   bounty: number,
   agentId: string,
-  creatorAddress?: string
+  creatorAddress?: string,
+  mode?: string
 ): Promise<QuestResponse> {
   const r = await fetch("/api/quest", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt, bounty, agentId, creatorAddress }),
+    body: JSON.stringify({ prompt, bounty, agentId, creatorAddress, mode }),
   });
   const data = await r.json();
   if (!r.ok) throw new Error(data?.error || "Quest failed");
@@ -85,11 +121,15 @@ export type RunResponse = {
   firedMemoryIds?: string[];
 };
 
-export async function runSkill(id: string, agentId: string): Promise<RunResponse> {
+export async function runSkill(
+  id: string,
+  agentId: string,
+  callerAddress?: string
+): Promise<RunResponse> {
   const r = await fetch(`/api/skills/${id}/run`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ agentId }),
+    body: JSON.stringify({ agentId, callerAddress }),
   });
   const data = await r.json();
   if (!r.ok) throw new Error(data?.error || "Run failed");

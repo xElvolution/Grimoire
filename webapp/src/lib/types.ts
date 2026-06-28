@@ -46,6 +46,15 @@ export type Quest = {
   firedSkillIds?: string[];
   reflex?: string;
   failureReason?: string;
+  mode?: string;
+  artifact?: {
+    type: "html" | "code" | "project";
+    content: string;
+    language?: string;
+    files?: Record<string, string>;
+    entry?: string;
+  };
+  creditCost?: number;
 };
 
 export type Agent = {
@@ -85,6 +94,7 @@ export type Memory = {
   kind?: MemoryKind;
   consolidatedFrom?: string; // episodic source id
   superseded?: boolean; // episodic faded after consolidation
+  onChainId?: number;
 };
 
 export type Synapse = {
@@ -105,6 +115,19 @@ export type RoyaltyEvent = {
   agentId: string;
   txHash?: string;
   verified: boolean;
+  at: number;
+};
+
+export type CreditEntry = {
+  id: string;
+  address: string;
+  type: "fund" | "debit" | "refund";
+  amount: number;
+  balanceAfter: number;
+  note?: string;
+  mode?: string;
+  questId?: string;
+  txHash?: string;
   at: number;
 };
 

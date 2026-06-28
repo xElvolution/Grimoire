@@ -3,6 +3,7 @@
 import { PrivyProvider } from "@privy-io/react-auth";
 import type { ReactNode } from "react";
 import { zerogGalileo } from "@/lib/chain";
+import { CreditsProvider } from "./CreditsProvider";
 
 export default function AppProviders({ children }: { children: ReactNode }) {
   const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID;
@@ -35,7 +36,7 @@ export default function AppProviders({ children }: { children: ReactNode }) {
         defaultChain: zerogGalileo,
       }}
     >
-      {children}
+      <CreditsProvider>{children}</CreditsProvider>
     </PrivyProvider>
   );
 }

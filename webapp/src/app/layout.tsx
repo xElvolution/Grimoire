@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cinzel, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import AppProviders from "@/components/providers/AppProviders";
+import { CreditsProvider } from "@/components/providers/CreditsProvider";
 import "./globals.css";
 
 const cinzel = Cinzel({

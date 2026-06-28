@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/store";
+import { SIGNUP_BONUS } from "@/lib/credits";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -39,6 +40,7 @@ export async function GET(req: NextRequest) {
     agents: db.agents(),
     royalties: db.royaltiesForAddress(address),
     creator: db.creatorForAddress(address),
+    credits: db.ensureCredits(address, SIGNUP_BONUS),
     stats: {
       totalSkills: db.skillsForAddress(address).length,
       totalUses: db.skillsForAddress(address).reduce((s, k) => s + k.uses, 0),

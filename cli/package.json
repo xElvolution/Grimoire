@@ -1,0 +1,19 @@
+{
+  "name": "@grimoire/cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "grimoire": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc && node dist/index.js"
+  },
+  "dependencies": {
+    "@grimoire/sdk": "file:../sdk"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}

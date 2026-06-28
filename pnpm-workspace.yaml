@@ -2,3 +2,4 @@ packages:
   - landing
   - webapp
   - sdk
+  - cli
