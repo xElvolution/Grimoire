@@ -1,5 +1,3 @@
-/** On-chain + app wallet snapshot for task routing. Server-side only. */
-
 import { ethers } from "ethers";
 import { zerogGalileo } from "@/lib/chain";
 import { DEPLOYMENTS } from "@/lib/contracts/deployments";

@@ -6,7 +6,6 @@ import { publishMindManifest } from "@/lib/mind";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-/** Nightly-style consolidation: episodic → semantic memory on 0G. */
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
   const memoryId: string = body.memoryId;

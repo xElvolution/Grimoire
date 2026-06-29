@@ -344,7 +344,7 @@ export default function TaskChat({ agents }: { agents: Agent[] }) {
               <p className="mt-3 text-sm text-ash max-w-lg mx-auto">
                 Post any task - build, research, wallet balance, trade, code, summarize.
                 Grimoire routes through memory, skills, and TEE; reusable methods become
-                skills others cast (you earn royalties).
+                skills others can run (you earn royalties).
               </p>
               <div className="mt-6 flex flex-wrap justify-center gap-2">
                 {STARTERS.map((ex) => (

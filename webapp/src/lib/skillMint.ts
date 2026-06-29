@@ -1,5 +1,3 @@
-/** Skill distillation rules - not every answer becomes a skill. Server-side. */
-
 import type { Rarity, Skill } from "./types";
 import { rarityFor, wordSimilarity } from "./skills";
 
@@ -16,10 +14,6 @@ const rarityRank: Record<Rarity, number> = {
   legendary: 3,
 };
 
-/**
- * Decide whether a solved task yields a mintable skill.
- * Answers always return; skills are rare, unique, reusable assets.
- */
 export function shouldMintSkill(
   prompt: string,
   verified: boolean,
@@ -68,7 +62,7 @@ export function shouldMintSkill(
   return {
     mint: true,
     rarity,
-    reason: `Distinctive ${rarity} skill distilled - stored on 0G, castable by any agent.`,
+    reason: `Distinctive ${rarity} skill distilled - stored on 0G, others can run it and you earn royalties.`,
   };
 }
 

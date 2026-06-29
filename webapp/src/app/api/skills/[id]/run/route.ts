@@ -8,7 +8,6 @@ import { publishMindManifest } from "@/lib/mind";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-/** A (different) agent casts an existing skill → verified in TEE → royalty to the creator. */
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }

@@ -1,7 +1,3 @@
-/**
- * Mind manifest - portable agent brain snapshot on 0G Storage.
- */
-
 import type { Agent, Memory, Skill, Synapse, MindManifest } from "./types";
 import { uploadJSON } from "./zerog/storage";
 

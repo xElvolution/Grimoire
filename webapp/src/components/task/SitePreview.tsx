@@ -43,7 +43,6 @@ function isCsbAppUrl(url: string): boolean {
   }
 }
 
-/** Full-bleed Sandpack preview - no bundler chrome, no wrong iframe URL. */
 function LiveSitePreview({
   onLiveUrl,
 }: {

@@ -13,6 +13,9 @@ import { detectArtifact } from "@/lib/extractArtifact";
 import {
   settleSkillUse,
   registerSkillOnChain,
+  mintAgentOnChain,
+  claimSkillOnChain,
+  mintGrimOnChain,
 } from "@/lib/contracts/onchain";
 import type { Skill, Quest } from "@/lib/types";
 
@@ -53,7 +56,7 @@ Code rules:
 const CLARIFY_SUFFIX = `
 
 The user wants a website but hasn't given enough detail yet.
-Respond as a friendly build assistant (like Claude):
+Respond as a friendly build assistant:
 - Ask 2-3 specific questions (style, audience, must-have sections).
 - Offer 2-3 concrete direction options they can pick (e.g. dark minimal portfolio, bold gaming neon, clean SaaS).
 - Do NOT output code files. Do NOT refuse or suggest external website builders.
@@ -97,6 +100,11 @@ export async function POST(req: NextRequest) {
   const createdAt = Date.now();
   const questId = `q_${createdAt}`;
 
+  // First time we see this wallet: mint a 100 GRIM welcome bonus on-chain.
+  // Fire-and-forget so it never blocks task posting.
+  if (db.isFirstTimeAddress(walletAddress)) {
+    mintGrimOnChain(walletAddress, 100).catch(() => {});
+  }
   db.ensureCredits(walletAddress, SIGNUP_BONUS);
   if (!db.deductCredits(walletAddress, creditCost, {
     mode,
@@ -142,6 +150,13 @@ export async function POST(req: NextRequest) {
       erc7857: route.spawnedAgent.erc7857,
       by: route.spawnedAgent.spawnedBy,
     };
+    // fire-and-forget: mint the new agent on AgentRegistry; don't block the response
+    const spawned = route.spawnedAgent;
+    mintAgentOnChain(spawned.id, spawned.specialty, 0)
+      .then((res) => {
+        if (res) db.setAgentOnChain(spawned.id, res.onChainId, res.txHash);
+      })
+      .catch(() => {});
   }
 
   const firedMemoryIds = route.memories.map((m) => m.id);
@@ -302,7 +317,7 @@ export async function POST(req: NextRequest) {
       ? {
           mint: true,
           rarity: rarityFor(trimmedForSolve, result.verified),
-          reason: `Build distilled into a reusable skill - stored on 0G, castable by any agent.`,
+          reason: `Build distilled into a reusable skill - stored on 0G, others can run it and you earn royalties.`,
         }
       : shouldMintSkill(trimmedForSolve, result.verified, db.skills());
 
@@ -328,18 +343,9 @@ export async function POST(req: NextRequest) {
       createdAt,
     };
 
-    try {
-      const up = await uploadJSON(record);
-      rootHash = up.rootHash;
-      txHash = up.txHash;
-    } catch {
-      rootHash =
-        "0x" +
-        Buffer.from(record.name + createdAt)
-          .toString("hex")
-          .padEnd(64, "0")
-          .slice(0, 64);
-    }
+    const up = await uploadJSON(record);
+    rootHash = up.rootHash;
+    txHash = up.txHash;
 
     const royaltyPerUse = royaltyForRarity(mintDecision.rarity);
     skill = {
@@ -365,6 +371,13 @@ export async function POST(req: NextRequest) {
 
     if (result.verified && !result.simulated) {
       skillOnchain = await registerSkillOnChain(rootHash, royaltyPerUse, creatorAddress);
+      // fire-and-forget: also claim this skill on the Marketplace so the
+      // creator owns its royalty stream and can list it for sale later.
+      claimSkillOnChain(rootHash)
+        .then((res) => {
+          if (res) db.setSkillMarketTx(rootHash, "claim", res.txHash);
+        })
+        .catch(() => {});
     }
   }
 
@@ -401,7 +414,7 @@ export async function POST(req: NextRequest) {
     skill,
     skillMinted: !!skill && !usedExisting,
     skillNote: usedExisting
-      ? `Used skill "${route.castSkill?.name}" with ${firedMemoryIds.length} memory(s).`
+      ? `Ran existing skill "${route.castSkill?.name}" with ${firedMemoryIds.length} memory(s). Royalty paid to creator.`
       : mintDecision.reason,
     spawnedAgent,
     simulated: result.simulated,
@@ -409,6 +422,7 @@ export async function POST(req: NextRequest) {
     firedMemories: route.memories,
     firedSkills: route.contextSkills,
     castSkill: usedExisting ? route.castSkill : null,
+    usedSkill: usedExisting ? route.castSkill : null,
     reflex: route.reflex,
     onchain,
     skillOnchain,

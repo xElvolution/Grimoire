@@ -1,5 +1,3 @@
-/** Extract buildable artifacts - Next.js projects, HTML fallback, code blocks. */
-
 export type HtmlArtifact = { type: "html"; content: string };
 export type CodeArtifact = { type: "code"; language: string; content: string };
 export type ProjectArtifact = {
@@ -62,7 +60,6 @@ function wrapHtml(body: string): string {
 </html>`;
 }
 
-/** Parse multi-file Next.js output from model (```tsx file:app/page.tsx). */
 export function extractProject(text: string): ProjectArtifact | null {
   const files: Record<string, string> = {};
 
@@ -107,7 +104,6 @@ export function normalizePath(p: string): string {
   return p.replace(/^\/+/, "").replace(/\\/g, "/");
 }
 
-/** Ensure minimal Next.js + Tailwind + Framer project structure for preview/export. */
 export function normalizeProjectFiles(raw: Record<string, string>): Record<string, string> {
   const files: Record<string, string> = {};
   for (const [k, v] of Object.entries(raw)) {
@@ -156,7 +152,6 @@ function sanitizePackageJson(raw: string): string {
   }
 }
 
-/** Strip Next.js-only syntax for in-browser React preview (Sandpack). */
 function sanitizeForPreview(code: string, renameDefaultToApp = false): string {
   let out = code
     .replace(/^["']use client["'];?\s*/gm, "")
@@ -173,7 +168,6 @@ function sanitizeForPreview(code: string, renameDefaultToApp = false): string {
   return out;
 }
 
-/** Fix imports for flat Sandpack tree: /App.tsx + /components/*. */
 function rewritePreviewImports(code: string, sandpackPath: string): string {
   const inComponents = sandpackPath.startsWith("components/");
 
@@ -228,7 +222,6 @@ const SANDPACK_TS_CONFIG = `{
   }
 }`;
 
-/** Map Next.js project paths to a flat React tree for Sandpack (no app/ router paths). */
 function sandpackComponentPath(path: string): string | null {
   const p = normalizePath(path);
   if (SANDPACK_SKIP.has(p) || p.endsWith(".md")) return null;
@@ -254,7 +247,6 @@ function sandpackComponentPath(path: string): string | null {
   return `components/${base}`;
 }
 
-/** React + Framer preview bundle - avoids Sandpack Next.js / @types/tailwindcss errors. */
 export function prepareSandpackFiles(project: ProjectArtifact): Record<string, string> {
   const out: Record<string, string> = {};
 
@@ -316,14 +308,12 @@ if (el) {
   </body>
 </html>`;
 
-  // Override template package.json - never send Next/Tailwind types to the Sandpack CDN.
   out["/package.json"] = SANDPACK_PACKAGE_JSON;
   out["/tsconfig.json"] = SANDPACK_TS_CONFIG;
 
   return out;
 }
 
-/** Sandpack expects leading-slash paths. */
 export function toSandpackFiles(files: Record<string, string>): Record<string, string> {
   const out: Record<string, string> = {};
   for (const [k, v] of Object.entries(files)) {

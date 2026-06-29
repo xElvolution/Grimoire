@@ -1,0 +1,86 @@
+:root {
+  --vp-c-brand-1: #a78bfa;
+  --vp-c-brand-2: #8b5cf6;
+  --vp-c-brand-3: #7c3aed;
+  --vp-c-brand-soft: rgba(139, 92, 246, 0.1);
+  --vp-button-brand-bg: #7c3aed;
+  --vp-button-brand-hover-bg: #6d28d9;
+}
+
+.dark {
+  --vp-c-bg: #09090b;
+  --vp-c-bg-alt: #0c0c0e;
+  --vp-c-bg-soft: #141416;
+}
+
+.VPHero .image-bg,
+.VPHero .image-container::before,
+.VPHero .image-container::after,
+.VPHero .image .bg {
+  display: none !important;
+  opacity: 0 !important;
+  background: none !important;
+}
+
+.VPHero .image,
+.VPHero .image-container,
+.VPHero .VPImage {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.VPHero .VPImage img {
+  width: 120px;
+  height: auto;
+  filter: none;
+  background: transparent !important;
+}
+
+.VPHero .name {
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.VPHero .text {
+  font-size: 1.125rem;
+  color: var(--vp-c-text-2);
+}
+
+.vp-doc h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-top: 0;
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+
+.vp-doc h1 + p {
+  color: var(--vp-c-text-2);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin-top: -0.5rem;
+  margin-bottom: 2rem;
+}
+
+.vp-doc img[src^="/banners/"] {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  margin: 1.5rem auto 2.5rem;
+  border-radius: 12px;
+}
+
+.VPSidebar .group + .group {
+  margin-top: 0.5rem;
+}
+
+.vp-doc a {
+  font-weight: 500;
+}
+
+.vp-doc div[class*="language-"] {
+  border-radius: 8px;
+}

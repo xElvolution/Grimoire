@@ -3,14 +3,7 @@
 import type { QuestResponse } from "@/lib/client";
 import type { Quest } from "@/lib/types";
 import Link from "next/link";
-
-const REFLEX_LABEL: Record<string, string> = {
-  "skill-cast": "Reused existing skill",
-  spawn: "Spawned specialist agent",
-  "category-match": "Matched specialist agent",
-  manual: "Routed to agent",
-  blocked: "Avoided failed approach",
-};
+import { REFLEX_LABEL } from "@/lib/reflexLabels";
 
 type Step = { label: string; detail?: string; tone?: "done" | "active" | "muted" };
 
@@ -32,7 +25,7 @@ function buildSteps(quest: Quest, meta: QuestResponse): Step[] {
 
   if (meta.reflex) {
     steps.push({
-      label: REFLEX_LABEL[meta.reflex] ?? meta.reflex,
+      label: REFLEX_LABEL[meta.reflex] ?? meta.reflex.replace(/-/g, " "),
       tone: "done",
     });
   }
@@ -40,7 +33,7 @@ function buildSteps(quest: Quest, meta: QuestResponse): Step[] {
   if (meta.directTask) {
     steps.push({
       label: DIRECT_LABEL[meta.directTask] ?? "Wallet action",
-      detail: "Live chain + app ledger - no TEE needed",
+      detail: "Live chain + app ledger",
       tone: "active",
     });
     return steps;
@@ -54,9 +47,10 @@ function buildSteps(quest: Quest, meta: QuestResponse): Step[] {
     });
   }
 
-  if (meta.castSkill) {
+  const reused = meta.usedSkill ?? meta.castSkill;
+  if (reused) {
     steps.push({
-      label: `Cast skill: ${meta.castSkill.name}`,
+      label: `Ran skill: ${reused.name}`,
       detail: "Paid royalty to creator · method reused from Library",
       tone: "active",
     });
@@ -68,10 +62,10 @@ function buildSteps(quest: Quest, meta: QuestResponse): Step[] {
     });
   }
 
-  if (!meta.castSkill) {
+  if (!reused) {
     steps.push({
-      label: quest.verified ? "Solved in TEE" : "Solved (simulated)",
-      detail: meta.simulated ? "Fund wallet for live 0G Compute" : "Verified inference",
+      label: quest.verified ? "Solved in 0G Compute (TEE)" : "Solved on 0G Compute",
+      detail: quest.verified ? "Cryptographically verified inference" : "Inference completed",
       tone: "done",
     });
   }
@@ -79,10 +73,10 @@ function buildSteps(quest: Quest, meta: QuestResponse): Step[] {
   if (meta.skillMinted && meta.skill) {
     steps.push({
       label: `New skill learned: ${meta.skill.name}`,
-      detail: "Stored on 0G · others can cast · you earn royalties",
+      detail: "Stored on 0G Storage · others can run it · you earn royalties",
       tone: "active",
     });
-  } else if (meta.skillNote && !meta.castSkill) {
+  } else if (meta.skillNote && !reused) {
     steps.push({
       label: "Skill distillation",
       detail: meta.skillNote,

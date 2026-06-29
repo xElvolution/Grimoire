@@ -1,5 +1,3 @@
-/** Minimal ABIs for on-chain integration (no forge build required at runtime). */
-
 export const SKILL_REGISTRY_ABI = [
   "function registerSkill(bytes32 rootHash, uint96 royaltyPerUse)",
   "function useSkill(bytes32 rootHash) payable",
@@ -35,8 +33,17 @@ export const SKILL_MARKETPLACE_ABI = [
   "function ownerOf(bytes32 skill) view returns (address)",
 ] as const;
 
+export const AGENT_REGISTRY_ABI = [
+  "function mintAgent(bytes32 metadata, string specialty, uint256 spawnedBy) returns (uint256 id)",
+  "function getAgent(uint256 id) view returns (address owner, bytes32 metadata, string specialty, uint64 reputation, uint256 spawnedBy)",
+  "function nextId() view returns (uint256)",
+  "event AgentMinted(uint256 indexed id, address indexed owner, string specialty, uint256 spawnedBy)",
+] as const;
+
 export const ERC20_ABI = [
   "function balanceOf(address account) view returns (uint256)",
   "function symbol() view returns (string)",
   "function decimals() view returns (uint8)",
+  "function mint(address to, uint256 value)",
+  "function transfer(address to, uint256 value) returns (bool)",
 ] as const;

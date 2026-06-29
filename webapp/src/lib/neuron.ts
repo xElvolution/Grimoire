@@ -1,8 +1,3 @@
-/**
- * Unified neuron graph - agents, memories, skills as nodes; synapses as weighted links.
- * Shared by EngramBrain, orchestrator, and brain API.
- */
-
 import type { Agent, Memory, Skill, Synapse, MemoryKind } from "./types";
 
 export type NeuronKind = "core" | "agent" | "memory" | "skill";
@@ -164,7 +159,6 @@ export function buildNeuronGraph(
   return { nodes, links };
 }
 
-/** Brain health scan per agent. */
 export function agentBrainHealth(
   agentId: string,
   agents: Agent[],

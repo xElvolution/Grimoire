@@ -1,5 +1,3 @@
-/** 0G credit pricing - fund once, pay per task (v0-style). */
-
 export type TaskModeId = "ask" | "build" | "code" | "summarize";
 
 export const CREDIT_COST: Record<TaskModeId, number> = {

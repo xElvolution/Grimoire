@@ -1,7 +1,3 @@
-/**
- * Memory consolidation - episodic engrams distilled into semantic facts (sleep cycle).
- */
-
 import type { Memory } from "./types";
 import { solve } from "./zerog/engine";
 import { uploadJSON } from "./zerog/storage";
@@ -30,20 +26,9 @@ export async function consolidateEpisodicMemory(
     createdAt: Date.now(),
   };
 
-  let rootHash = "";
-  let txHash: string | undefined;
-  try {
-    const up = await uploadJSON(record);
-    rootHash = up.rootHash;
-    txHash = up.txHash;
-  } catch {
-    rootHash =
-      "0x" +
-      Buffer.from(label + content + record.createdAt)
-        .toString("hex")
-        .padEnd(64, "0")
-        .slice(0, 64);
-  }
+  const up = await uploadJSON(record);
+  const rootHash = up.rootHash;
+  const txHash = up.txHash;
 
   return { label, content, rootHash, txHash };
 }

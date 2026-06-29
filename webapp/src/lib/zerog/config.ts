@@ -1,9 +1,3 @@
-/**
- * 0G network configuration (Galileo testnet).
- * Sourced from the 0G storage starter kit + agent-skills NETWORK_CONFIG.
- * Server-side only - never import into client components (the SDKs touch fs/crypto).
- */
-
 export const ZEROG = {
   rpcUrl: process.env.RPC_URL || "https://evmrpc-testnet.0g.ai",
   chainId: Number(process.env.CHAIN_ID || 16602),

@@ -1,10 +1,3 @@
-/**
- * Lightweight file-backed store for the Grimoire economy index.
- * 0G Storage holds the canonical skill records; this tracks the live index,
- * agents, creators, royalty feed, and XP so the app has state across restarts.
- * Server-side only.
- */
-
 import fs from "fs";
 import path from "path";
 import type { Skill, Quest, Agent, Creator, RoyaltyEvent, Memory, Synapse, CreditEntry } from "./types";
@@ -189,7 +182,6 @@ export const db = {
     if (!p.linkedAgents.includes(agentId)) p.linkedAgents.push(agentId);
     this.strengthenSynapse(agentId, partnerId, "linked");
     this.strengthenSynapse(partnerId, agentId, "linked");
-    // Corpus callosum - grant mutual read on owned memories
     for (const m of d.memories ?? []) {
       if (m.agentId === agentId && !m.grantedTo.includes(partnerId)) {
         m.grantedTo.push(partnerId);
@@ -258,7 +250,6 @@ export const db = {
     return load().agents.find((a) => a.id === id);
   },
 
-  /** An agent already specialized in this category, if one exists. */
   agentForCategory(category: string): Agent | undefined {
     return load().agents.find((a) => a.specialty === category);
   },
@@ -269,7 +260,6 @@ export const db = {
       .sort((a, b) => b.reputation - a.reputation)[0];
   },
 
-  /** Mint a brand-new specialist agent (ERC-7857) for a domain no agent covers. */
   spawnAgent(specialty: string, byAgentId?: string): Agent {
     const d = load();
     const NAMES = ["Vesper", "Onyx", "Sable", "Cipher", "Quill", "Ember", "Wren", "Halcyon", "Thorne", "Isolde", "Rune", "Mordecai"];
@@ -316,7 +306,6 @@ export const db = {
     persist();
   },
 
-  /** Record a skill use: bump uses, pay royalty to creator (unless self-use), award agent XP. */
   recordUse(
     skillId: string,
     agentId: string,
@@ -396,7 +385,6 @@ export const db = {
     return s;
   },
 
-  /** Buy a listed skill: ownership (royalty recipient) transfers to the buyer. */
   buySkill(id: string, buyer: string): Skill | null {
     const d = load();
     const s = d.skills.find((x) => x.id === id);
@@ -408,6 +396,25 @@ export const db = {
     if (!c) d.creators.push({ handle: buyer, xp: 0, level: 1, earnings: 0, skillsCreated: 0 });
     persist();
     return s;
+  },
+
+  /** Persist a Marketplace tx hash (claim / list / buy) against a skill. */
+  setSkillMarketTx(id: string, action: "claim" | "list" | "buy", txHash: string) {
+    const s = load().skills.find((x) => x.id === id);
+    if (!s) return;
+    if (action === "claim") s.marketClaimTx = txHash;
+    if (action === "list") s.marketListTx = txHash;
+    if (action === "buy") s.marketBuyTx = txHash;
+    persist();
+  },
+
+  /** Persist AgentRegistry on-chain identifiers against an agent. */
+  setAgentOnChain(agentId: string, tokenId: number, txHash: string) {
+    const a = load().agents.find((x) => x.id === agentId);
+    if (!a) return;
+    a.onChainTokenId = tokenId;
+    a.onChainMintTx = txHash;
+    persist();
   },
 
   creator(handle: string): Creator {
@@ -492,6 +499,12 @@ export const db = {
       persist();
     }
     return d.credits[key];
+  },
+
+  /** True iff this address has never had a credits row before this call. */
+  isFirstTimeAddress(address: string): boolean {
+    const d = load();
+    return d.credits[normAddr(address)] === undefined;
   },
 
   addCredits(address: string, amount: number, meta?: { txHash?: string; note?: string }): number {

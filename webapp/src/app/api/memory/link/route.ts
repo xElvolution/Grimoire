@@ -5,7 +5,6 @@ import { publishMindManifest } from "@/lib/mind";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-/** Corpus callosum - link two agents to share explicit memory synapses. */
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
   const agentId: string = body.agentId;
@@ -33,6 +32,6 @@ export async function POST(req: NextRequest) {
     ok: true,
     agent: linked,
     partner,
-    note: "Corpus callosum linked - agents share explicit memory synapses.",
+    note: "Agents linked - shared memory access enabled.",
   });
 }

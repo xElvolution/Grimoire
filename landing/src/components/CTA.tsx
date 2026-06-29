@@ -16,7 +16,6 @@ export default function CTA() {
             transition={{ duration: 0.9, ease: "easeOut" }}
             className="relative rounded-[2rem] glass rune-border p-10 sm:p-16 overflow-hidden"
           >
-            {/* halo */}
             <div className="absolute -inset-1 bg-gradient-to-r from-arcane/20 via-mana/10 to-ember/20 blur-2xl pointer-events-none" />
 
             <div className="relative">

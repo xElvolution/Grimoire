@@ -1,5 +1,3 @@
-/** Derive a reusable Skill from a solved quest. Server-side. */
-
 import type { Rarity } from "./types";
 
 const CATEGORIES: { key: string; words: string[]; glyph: string }[] = [
@@ -59,7 +57,6 @@ export function normalizeText(s: string) {
   return s.trim().toLowerCase().replace(/\s+/g, " ");
 }
 
-/** Word overlap similarity 0..1 - used by orchestrator and mint gate. */
 export function wordSimilarity(a: string, b: string): number {
   const wa = new Set(normalizeText(a).split(" ").filter((w) => w.length > 3));
   const wb = new Set(normalizeText(b).split(" ").filter((w) => w.length > 3));

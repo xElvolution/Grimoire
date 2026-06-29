@@ -12,7 +12,6 @@ const STEPS = [
   { id: "polish", label: "Final polish", detail: "Responsive & spacing" },
 ];
 
-/** v0-style progress - advances once, stays on last step (no looping replay). */
 export default function BuildProgressCards({
   compact = false,
   panel = false,

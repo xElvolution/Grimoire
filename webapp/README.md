@@ -2,14 +2,13 @@
 
 The Grimoire product: post a task → an AI agent solves it on **0G Compute (TEE)** →
 the reusable method is minted as a **Skill** on **0G Storage**, owned by you → any
-agent can cast that skill, and **every verified use pays you a royalty**.
+agent can **run** that skill, and **every verified use pays you a royalty**.
 
 ## The loop (real, end-to-end)
-1. **Post a task** (`/api/quest`) → `solve()` runs it on 0G Compute (verified in a TEE
-   when the wallet is funded) → the skill record is uploaded to 0G Storage → indexed.
-2. **Cast a skill** (`/api/skills/[id]/run`) → a *different* agent re-runs the skill's
-   recipe on 0G Compute → on a verified use, a **royalty** is paid to the creator,
-   XP is awarded, and the live feed updates.
+1. **Post a task** (`/api/quest`) → `solve()` runs it on 0G Compute (TEE-verified) →
+   the skill record is uploaded to 0G Storage → indexed.
+2. **Run a skill** (`/api/skills/[id]/run`) → a *different* agent re-runs the skill's
+   recipe on 0G Compute → on a verified use, a **royalty** is paid to the creator.
 
 ## Stack
 - Next.js 16 (App Router) · React 19 · TypeScript · Tailwind v4 · Framer Motion
@@ -25,12 +24,10 @@ cp .env.example .env.local          # then set PRIVATE_KEY (a throwaway testnet 
 npm run dev                         # http://localhost:3000 (falls back if busy)
 ```
 
-## Live vs simulated
-`src/lib/zerog/engine.ts` always tries **real** 0G Compute first. If the wallet
-isn't funded / no provider is up, it falls back to a clearly-labeled **simulation**
-(`verified:false`, shown as "Simulated" in the UI) so the economy is demoable. The
-moment the wallet is funded it goes **live automatically** - no code change.
-Set `GRIMOIRE_SIMULATE=0` to force real-only.
+## 0G Compute (real only)
+`src/lib/zerog/engine.ts` runs **only** on real 0G Compute (TEE). Set `PRIVATE_KEY` in
+`.env.local` and fund the address at https://faucet.0g.ai - tasks fail clearly if the
+wallet or ledger is not ready (no fake answers).
 
 ## Layout
 ```
@@ -40,12 +37,12 @@ src/
     api/
       state/route.ts          GET the full economy state
       quest/route.ts          POST a task -> solve -> mint skill on 0G
-      skills/[id]/run/route.ts POST cast a skill -> verify -> royalty
+      skills/[id]/run/route.ts POST run a skill -> verify -> royalty
   lib/
     zerog/config.ts           network endpoints + key
     zerog/storage.ts          0G Storage upload/download (JSON)
     zerog/compute.ts          0G Compute TEE inference + processResponse
-    zerog/engine.ts           real-first, simulation-fallback solve()
+    zerog/engine.ts           real 0G Compute only
     store.ts                  file-backed economy index (.data/, gitignored)
     skills.ts                 skill naming / category / rarity / royalty
     types.ts, client.ts       shared types + browser fetch helpers

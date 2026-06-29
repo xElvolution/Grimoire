@@ -136,7 +136,6 @@ export default function MemoryPage() {
         </div>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-5">
-          {/* write panel */}
           <div className="lg:col-span-2 rounded-2xl glass rune-border p-6">
             <h2 className="font-display text-lg text-parchment">Save a note</h2>
             <p className="mt-1 text-[11px] text-ash">
@@ -215,7 +214,6 @@ export default function MemoryPage() {
           </div>
         </div>
 
-        {/* memory list */}
           <div className="lg:col-span-3 space-y-3">
             {memories.length === 0 && (
               <div className="rounded-2xl glass p-10 text-center text-sm text-ash">

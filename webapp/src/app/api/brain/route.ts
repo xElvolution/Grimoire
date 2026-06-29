@@ -5,7 +5,6 @@ import { buildNeuronGraph, agentBrainHealth } from "@/lib/neuron";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-/** Neuron graph + brain health scan for EngramBrain and dashboards. */
 export async function GET() {
   const agents = db.agents();
   const skills = db.skills();

@@ -1,8 +1,3 @@
-/**
- * Instant task handlers - wallet, balance, skills list.
- * Orchestrator still plans route; these skip TEE for known info queries.
- */
-
 import { db } from "@/lib/store";
 import { formatCredits } from "@/lib/credits";
 import { fetchWalletSnapshot, formatWalletSnapshot } from "@/lib/walletState";
@@ -78,7 +73,7 @@ export async function runDirectTask(
       return {
         kind,
         answer:
-          "You haven't minted any skills yet. Post a task - when Grimoire finds a reusable method, it distills into a skill on 0G Storage that others can cast (and pay you for).",
+          "You haven't minted any skills yet. Post a task - when Grimoire finds a reusable method, it becomes a skill on 0G Storage that others can run (and pay you for).",
       };
     }
     const lines = skills

@@ -1,7 +1,3 @@
-/**
- * Spinal cord - routes quests, retrieves neurons, injects context into TEE prompts.
- */
-
 import type { Agent, Memory, Skill, Synapse } from "./types";
 import { categorize, wordSimilarity } from "./skills";
 
@@ -37,7 +33,6 @@ function synapseBoost(synapses: Synapse[], from: string, to: string, kind: Synap
   return s?.weight ?? 1;
 }
 
-/** Agents that share explicit memory via grant or corpus callosum link. */
 function memoryPartners(agentId: string, agents: Agent[]): string[] {
   const agent = agents.find((a) => a.id === agentId);
   const linked = agent?.linkedAgents ?? [];
@@ -182,7 +177,6 @@ export function planQuest(input: PlanInput): RoutePlan {
   };
 }
 
-/** Fire explicit + implicit neurons into the TEE prompt. */
 export function injectContext(
   prompt: string,
   memories: Memory[],
@@ -210,13 +204,11 @@ export function injectContext(
   return parts.join("\n\n");
 }
 
-/** Wallet context for trade, balance-aware, and on-chain tasks. */
 export function injectWalletContext(prompt: string, walletBlock: string): string {
   if (!walletBlock.trim()) return prompt.trim();
   return `=== Connected wallet (0G Galileo) ===\n${walletBlock}\n\n=== Task ===\n${prompt.trim()}`;
 }
 
-/** User-facing task text when a prompt includes injected memory/skill blocks. */
 export function extractTaskPrompt(enriched: string): string {
   const marker = "=== Task ===";
   const idx = enriched.indexOf(marker);
@@ -224,7 +216,6 @@ export function extractTaskPrompt(enriched: string): string {
   return enriched.trim();
 }
 
-/** Strip internal injection headers if they leaked into a model answer. */
 export function formatUserFacingAnswer(answer: string): string {
   if (/=== Connected wallet/.test(answer)) {
     const task = extractTaskPrompt(answer);

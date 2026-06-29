@@ -1,10 +1,5 @@
 "use client";
 
-/**
- * Reveal - GSAP ScrollTrigger fade/slide-up wrapper.
- * Children animate in once as they enter the viewport.
- */
-
 import { useRef, type ReactNode } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";

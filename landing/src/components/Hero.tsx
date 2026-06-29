@@ -4,7 +4,6 @@ import dynamic from "next/dynamic";
 import { motion, type Variants } from "framer-motion";
 import { APP_URL } from "@/lib/links";
 
-// 3D canvas is client-only; skip SSR to avoid hydration cost
 const AgentNetwork = dynamic(() => import("./AgentNetwork"), { ssr: false });
 
 const container: Variants = {
@@ -22,12 +21,10 @@ export default function Hero() {
       id="top"
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
-      {/* 3D network */}
       <div className="absolute inset-0 z-0">
         <AgentNetwork />
       </div>
 
-      {/* runic grid + vignette */}
       <div className="absolute inset-0 z-10 bg-runic-grid pointer-events-none" />
       <div className="absolute inset-0 z-10 bg-gradient-to-b from-void/40 via-transparent to-void pointer-events-none" />
 
@@ -84,7 +81,6 @@ export default function Hero() {
           </a>
         </motion.div>
 
-        {/* live stat strip */}
         <motion.div
           variants={item}
           className="mt-16 grid grid-cols-3 gap-px max-w-2xl mx-auto rounded-2xl overflow-hidden glass"
@@ -102,7 +98,6 @@ export default function Hero() {
         </motion.div>
       </motion.div>
 
-      {/* scroll cue */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 text-ash/60 text-xs tracking-widest uppercase flex flex-col items-center gap-2">
         <span>Scroll</span>
         <span className="w-px h-8 bg-gradient-to-b from-arcane to-transparent" />

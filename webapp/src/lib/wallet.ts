@@ -2,7 +2,6 @@
 
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 
-/** Privy-backed wallet session for Grimoire. */
 export function useGrimoireWallet() {
   const { ready, authenticated, login, logout } = usePrivy();
   const { wallets } = useWallets();

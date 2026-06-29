@@ -11,7 +11,6 @@ export async function GET() {
   return NextResponse.json({ memories: db.memories(), agents: db.agents() });
 }
 
-/** Write a memory for an agent - persisted to 0G Storage. */
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
   const agentId: string = body.agentId;
@@ -39,19 +38,10 @@ export async function POST(req: NextRequest) {
   let rootHash = "";
   let txHash: string | undefined;
   let verified = false;
-  try {
-    const up = await uploadJSON(record);
-    rootHash = up.rootHash;
-    txHash = up.txHash;
-    verified = true;
-  } catch {
-    rootHash =
-      "0x" +
-      Buffer.from(label + content + createdAt)
-        .toString("hex")
-        .padEnd(64, "0")
-        .slice(0, 64);
-  }
+  const up = await uploadJSON(record);
+  rootHash = up.rootHash;
+  txHash = up.txHash;
+  verified = true;
 
   const memory: Memory = {
     id: rootHash,

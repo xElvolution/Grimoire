@@ -48,6 +48,7 @@ export type QuestResponse = {
   firedMemories?: Memory[];
   firedSkills?: Skill[];
   castSkill?: Skill | null;
+  usedSkill?: Skill | null;
   reflex?: string;
   onchain?: { txHash: string; url: string; method?: string } | null;
   credits?: number;
@@ -136,8 +137,6 @@ export async function runSkill(
   return data;
 }
 
-// ---- memory ----------------------------------------------------------------
-
 export type MemoryState = { memories: Memory[]; agents: Agent[] };
 
 export async function fetchMemory(): Promise<MemoryState> {
@@ -218,8 +217,6 @@ export async function linkAgents(agentId: string, partnerId: string) {
   if (!r.ok) throw new Error(data?.error || "Link failed");
   return data;
 }
-
-// ---- market ----------------------------------------------------------------
 
 export type MarketState = { listings: Skill[]; skills: Skill[] };
 

@@ -216,19 +216,17 @@ A monorepo with four packages:
 
 ```
 0G-agent/
+├── docs-site/            VitePress docs → doc.grimoire.xyz
 ├── docs/
 │   └── engram/           BUILD.md, WHY.md, neuroscience, diagrams, neuron guide
 ├── landing/              Marketing site - Next.js 16, Three.js hero, GSAP, Framer Motion
 ├── webapp/               The product - the live agent economy + real 0G integration
-│   └── src/
-│       ├── app/                  dashboard, /memory, API routes (quest, cast, state)
-│       ├── lib/zerog/            0G Compute (TEE) + 0G Storage integration
-│       ├── lib/store.ts          economy index (skills, agents, royalties, XP)
-│       ├── components/app/       composer, skill cards, royalty feed, counters
-│       └── components/memory/    EngramBrain neural visualization
-├── sdk/                  the SDK other agents/apps plug into
+├── sdk/                  @grimoire/sdk
+├── cli/                  grimoire CLI
 └── contracts/            SkillRegistry, AgentRegistry, MemoryRegistry, RoyaltyVault, …
 ```
+
+**Documentation:** https://doc.grimoire.xyz (or `cd docs-site && npm run dev`)
 
 ## Tech stack
 

@@ -23,7 +23,6 @@ const comps = [
 export default function Economy() {
   const [active, setActive] = useState(0);
 
-  // cycle the flywheel - one step lights up at a time, like a turning wheel
   useEffect(() => {
     const id = setInterval(() => setActive((a) => (a + 1) % flywheel.length), 1300);
     return () => clearInterval(id);
@@ -46,10 +45,8 @@ export default function Economy() {
           </p>
         </Reveal>
 
-        {/* flywheel */}
         <Reveal className="mt-16">
           <div className="relative mx-auto max-w-3xl rounded-3xl glass p-8 sm:p-10">
-            {/* rotating energy ring behind the wheel */}
             <div className="pointer-events-none absolute inset-0 grid place-items-center">
               <div
                 className="h-[26rem] w-[26rem] rounded-full animate-spin-slow opacity-40"
@@ -115,7 +112,6 @@ export default function Economy() {
           </div>
         </Reveal>
 
-        {/* comparables */}
         <Reveal className="mt-16">
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {comps.map((c) => (

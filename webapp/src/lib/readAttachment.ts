@@ -1,5 +1,3 @@
-/** Read user attachments in the browser (text-based files). */
-
 const TEXT_EXT = /\.(txt|md|markdown|json|csv|html|htm|ts|tsx|js|jsx|py|sol|xml|yaml|yml|log)$/i;
 
 export type Attachment = {

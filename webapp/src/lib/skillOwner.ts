@@ -1,7 +1,6 @@
 import type { Skill } from "./types";
 import { shortAddress } from "./chain";
 
-/** Never show "you" unless the viewer's wallet owns the skill. */
 export function skillCreatorLabel(
   skill: Skill,
   viewerAddress?: string | null

@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useGrimoireWallet } from "@/lib/wallet";
 import type { Agent } from "@/lib/types";
 import { postQuest, type QuestResponse } from "@/lib/client";
+import { reflexLabel } from "@/lib/reflexLabels";
 
 const STEPS = [
   "Routing task to agent…",
@@ -155,13 +156,9 @@ export default function QuestComposer({
           >
             <div className="flex items-center justify-between gap-2">
               <span className="font-display text-parchment">Answer</span>
-              {result.quest.verified ? (
+              {result.quest.verified && (
                 <span className="rounded-full bg-emerald/10 border border-emerald/30 px-2 py-0.5 text-[10px] text-emerald">
-                  ✓ TEE
-                </span>
-              ) : (
-                <span className="rounded-full bg-ember/10 border border-ember/30 px-2 py-0.5 text-[10px] text-ember-bright">
-                  sim
+                  ✓ TEE verified
                 </span>
               )}
             </div>
@@ -194,7 +191,7 @@ export default function QuestComposer({
 
             {result.reflex && (
               <div className="text-[11px] text-ash">
-                Spinal reflex: <span className="text-mana">{result.reflex}</span>
+                Routing: <span className="text-mana">{reflexLabel(result.reflex)}</span>
               </div>
             )}
 
@@ -213,9 +210,9 @@ export default function QuestComposer({
               </div>
             )}
 
-            {result.castSkill && (
+            {(result.usedSkill ?? result.castSkill) && (
               <div className="rounded-lg border border-ember/20 bg-ember/5 px-3 py-2 text-xs text-ember-bright">
-                Cast implicit skill: {result.castSkill.name}
+                Reused skill: {(result.usedSkill ?? result.castSkill)!.name}
               </div>
             )}
           </motion.div>

@@ -1,4 +1,3 @@
-/** Canonical 0G Galileo contract addresses. */
 export const DEPLOYMENTS = {
   network: "0g-galileo-testnet",
   chainId: 16602,

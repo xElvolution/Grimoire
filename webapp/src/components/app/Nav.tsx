@@ -12,6 +12,7 @@ const LINKS = [
   { href: "/library", label: "Library" },
   { href: "/memory", label: "Memory" },
   { href: "/market", label: "Market" },
+  { href: "/explore", label: "Explore" },
 ];
 
 export default function Nav({ right }: { right?: ReactNode }) {

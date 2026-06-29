@@ -41,13 +41,9 @@ export default function SkillCard({
           </div>
           <h3 className="mt-1 font-display text-lg text-parchment truncate">{skill.name}</h3>
         </div>
-        {skill.verified ? (
+        {skill.verified && (
           <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-emerald/10 border border-emerald/30 px-2 py-0.5 text-[10px] text-emerald">
-            ✓ TEE
-          </span>
-        ) : (
-          <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-white/5 border border-white/10 px-2 py-0.5 text-[10px] text-ash">
-            sim
+            ✓ TEE verified
           </span>
         )}
       </div>

@@ -67,11 +67,7 @@ export default function RoyaltyFeed({
                 </div>
                 <div className="text-[10px] text-ash/60">
                   → {e.to} · {ago(e.at)}{" "}
-                  {e.verified ? (
-                    <span className="text-emerald">· ✓ TEE</span>
-                  ) : (
-                    <span className="text-ash/50">· sim</span>
-                  )}
+                  {e.verified && <span className="text-emerald">· ✓ TEE</span>}
                 </div>
               </div>
               <div className="shrink-0 text-right">

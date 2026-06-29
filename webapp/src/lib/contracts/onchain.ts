@@ -1,9 +1,3 @@
-/**
- * On-chain settlement via deployed Grimoire contracts.
- * Royalties: RoyaltyVault.deposit → SkillRegistry.useSkill fallback.
- * Skills/memories: registration txs prepared for user wallet when needed.
- */
-
 import { ethers } from "ethers";
 import { ZEROG, getPrivateKey } from "@/lib/zerog/config";
 import { payRoyalty } from "@/lib/zerog/payments";
@@ -12,9 +6,19 @@ import {
   SKILL_REGISTRY_ABI,
   ROYALTY_VAULT_ABI,
   MEMORY_REGISTRY_ABI,
+  SKILL_MARKETPLACE_ABI,
+  AGENT_REGISTRY_ABI,
+  ERC20_ABI,
 } from "./abis";
 
 export type OnchainResult = { txHash: string; url: string; method: string } | null;
+
+/** Deterministic placeholder address per Grimoire agent id (not a real wallet).
+ *  Lets MemoryRegistry.grant/revoke target a stable address per agent so the
+ *  off-chain access change has an on-chain mirror with a real tx hash. */
+export function agentAddress(agentId: string): string {
+  return ethers.getAddress("0x" + ethers.id(`grimoire-agent:${agentId}`).slice(26));
+}
 
 function protocolSigner(): ethers.Wallet {
   const provider = new ethers.JsonRpcProvider(ZEROG.rpcUrl);
@@ -26,7 +30,6 @@ function toBytes32(id: string): string {
   return ethers.id(id);
 }
 
-/** Credit creator via RoyaltyVault, then direct transfer fallback. */
 export async function settleRoyalty(
   creator: string,
   amountOg: number
@@ -45,15 +48,12 @@ export async function settleRoyalty(
     await tx.wait(1);
     return { txHash: tx.hash, url: explorerTx(tx.hash), method: "RoyaltyVault.deposit" };
   } catch {
-    /* vault failed - direct transfer */
+    const direct = await payRoyalty(creator, amountOg);
+    if (!direct) return null;
+    return { txHash: direct.txHash, url: direct.url, method: "direct.transfer" };
   }
-
-  const direct = await payRoyalty(creator, amountOg);
-  if (!direct) return null;
-  return { txHash: direct.txHash, url: direct.url, method: "direct.transfer" };
 }
 
-/** Settle skill use on SkillRegistry when skill is registered on-chain. */
 export async function settleSkillUse(
   rootHash: string,
   amountOg: number,
@@ -80,7 +80,6 @@ export async function settleSkillUse(
   }
 }
 
-/** Register skill on-chain from protocol wallet (creator must match signer for royalties). */
 export async function registerSkillOnChain(
   rootHash: string,
   royaltyOg: number,
@@ -114,7 +113,6 @@ export async function registerSkillOnChain(
   };
 }
 
-/** Store memory root on MemoryRegistry (protocol-owned entry; ACL off-chain + grant). */
 export async function storeMemoryOnChain(
   rootHash: string,
   label: string
@@ -187,7 +185,6 @@ export async function revokeMemoryOnChain(
   }
 }
 
-/** Unsigned tx for user wallet to register their skill. */
 export function buildRegisterSkillTx(rootHash: string, royaltyOg: number) {
   const iface = new ethers.Interface(SKILL_REGISTRY_ABI);
   const root = toBytes32(rootHash);
@@ -198,4 +195,119 @@ export function buildRegisterSkillTx(rootHash: string, royaltyOg: number) {
     value: "0x0",
     chainId: DEPLOYMENTS.chainId,
   };
+}
+
+// ============================================================
+//  AgentRegistry  (ERC-7857-style on-chain Agentic ID)
+// ============================================================
+
+export async function mintAgentOnChain(
+  agentId: string,
+  specialty: string,
+  spawnedBy = 0
+): Promise<{ onChainId: number; txHash: string; url: string } | null> {
+  try {
+    const signer = protocolSigner();
+    const registry = new ethers.Contract(
+      DEPLOYMENTS.contracts.AgentRegistry,
+      AGENT_REGISTRY_ABI,
+      signer
+    );
+    // metadata = deterministic hash of agent id (placeholder for 0G mind pointer)
+    const metadata = ethers.id(`grimoire-agent-mind:${agentId}`);
+    const tx = await registry.mintAgent(metadata, specialty.slice(0, 60), spawnedBy);
+    const receipt = await tx.wait(1);
+    let onChainId = 0;
+    for (const log of receipt.logs) {
+      try {
+        const parsed = registry.interface.parseLog(log);
+        if (parsed?.name === "AgentMinted") onChainId = Number(parsed.args[0]);
+      } catch {
+        /* skip */
+      }
+    }
+    if (!onChainId) onChainId = Number(await registry.nextId()) - 1;
+    return { onChainId, txHash: tx.hash, url: explorerTx(tx.hash) };
+  } catch {
+    return null;
+  }
+}
+
+// ============================================================
+//  SkillMarketplace  (claim, list, buy ownership of a skill)
+// ============================================================
+
+function marketContract() {
+  return new ethers.Contract(
+    DEPLOYMENTS.contracts.SkillMarketplace,
+    SKILL_MARKETPLACE_ABI,
+    protocolSigner()
+  );
+}
+
+export async function claimSkillOnChain(rootHash: string): Promise<OnchainResult> {
+  try {
+    const tx = await marketContract().claim(toBytes32(rootHash));
+    await tx.wait(1);
+    return { txHash: tx.hash, url: explorerTx(tx.hash), method: "SkillMarketplace.claim" };
+  } catch {
+    return null;
+  }
+}
+
+export async function listSkillOnChain(
+  rootHash: string,
+  priceOg: number
+): Promise<OnchainResult> {
+  try {
+    const price = ethers.parseEther(priceOg.toFixed(6));
+    const tx = await marketContract().list(toBytes32(rootHash), price);
+    await tx.wait(1);
+    return { txHash: tx.hash, url: explorerTx(tx.hash), method: "SkillMarketplace.list" };
+  } catch {
+    return null;
+  }
+}
+
+export async function buySkillOnChain(
+  rootHash: string,
+  priceOg: number
+): Promise<OnchainResult> {
+  try {
+    const value = ethers.parseEther(priceOg.toFixed(6));
+    const tx = await marketContract().buy(toBytes32(rootHash), { value });
+    await tx.wait(1);
+    return { txHash: tx.hash, url: explorerTx(tx.hash), method: "SkillMarketplace.buy" };
+  } catch {
+    return null;
+  }
+}
+
+// ============================================================
+//  GrimToken  ($GRIM ERC-20)
+// ============================================================
+
+export async function mintGrimOnChain(to: string, amount: number): Promise<OnchainResult> {
+  if (!to || amount <= 0) return null;
+  try {
+    const signer = protocolSigner();
+    const grim = new ethers.Contract(DEPLOYMENTS.contracts.GrimToken, ERC20_ABI, signer);
+    const value = ethers.parseEther(amount.toFixed(6));
+    const tx = await grim.mint(to, value);
+    await tx.wait(1);
+    return { txHash: tx.hash, url: explorerTx(tx.hash), method: "GrimToken.mint" };
+  } catch {
+    return null;
+  }
+}
+
+export async function grimBalanceOf(address: string): Promise<number> {
+  try {
+    const provider = new ethers.JsonRpcProvider(ZEROG.rpcUrl);
+    const grim = new ethers.Contract(DEPLOYMENTS.contracts.GrimToken, ERC20_ABI, provider);
+    const bal = (await grim.balanceOf(address)) as bigint;
+    return Number(ethers.formatEther(bal));
+  } catch {
+    return 0;
+  }
 }

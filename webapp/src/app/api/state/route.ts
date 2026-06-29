@@ -19,12 +19,12 @@ export async function GET(req: NextRequest) {
   if (!address) {
     return NextResponse.json({
       walletConnected: false,
-      skills: [],
+      skills: networkSkills,
       quests: [],
       agents: db.agents(),
-      royalties: [],
+      royalties: networkRoyalties.slice(0, 20),
       creator: db.emptyCreator(),
-      stats: db.emptyStats(),
+      stats: networkStats,
       network: {
         skills: networkSkills,
         stats: networkStats,

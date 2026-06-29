@@ -1,10 +1,5 @@
 "use client";
 
-/**
- * GrimoireBrain - living neural mirror of the agent economy.
- * Uses unified neuron graph (agents · skills · memories · synaptic plasticity).
- */
-
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";

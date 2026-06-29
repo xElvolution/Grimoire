@@ -1,5 +1,3 @@
-/** Core domain model for the Grimoire economy. */
-
 export type Rarity = "common" | "rare" | "epic" | "legendary";
 
 export type MemoryKind = "episodic" | "semantic" | "failure" | "preference";
@@ -26,6 +24,9 @@ export type Skill = {
   txHash?: string; // 0G Storage tx
   forSale?: boolean;
   price?: number; // listing price in 0G
+  marketClaimTx?: string; // SkillMarketplace.claim tx hash
+  marketListTx?: string;  // SkillMarketplace.list tx hash
+  marketBuyTx?: string;   // SkillMarketplace.buy tx hash
 };
 
 export type Quest = {
@@ -70,6 +71,8 @@ export type Agent = {
   spawnedBy?: string; // name of the agent that minted this one
   createdAt?: number;
   linkedAgents?: string[]; // corpus callosum - shared memory partners
+  onChainTokenId?: number; // AgentRegistry tokenId
+  onChainMintTx?: string;  // AgentRegistry.mintAgent tx hash
 };
 
 export type Creator = {

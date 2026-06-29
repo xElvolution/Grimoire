@@ -1,7 +1,3 @@
-/**
- * @grimoire/sdk - TypeScript client for the Grimoire agent economy on 0G.
- */
-
 export type Rarity = "common" | "rare" | "epic" | "legendary";
 
 export interface Skill {
@@ -107,17 +103,15 @@ export class GrimoireClient {
   private readonly _fetch: typeof fetch;
 
   constructor(config: GrimoireConfig = {}) {
-    this.baseUrl = (config.baseUrl ?? "http://localhost:3000").replace(/\/$/, "");
+    this.baseUrl = (config.baseUrl ?? "https://heygrimoire.xyz").replace(/\/$/, "");
     const f = config.fetch ?? globalThis.fetch;
     if (!f) throw new GrimoireError("No fetch - pass fetch in config.");
     this._fetch = f.bind(globalThis);
   }
 
-  /** Post a task (primary API - skills used automatically by orchestrator). */
   async createTask(
     prompt: string,
     opts: {
-      mode?: string;
       bounty?: number;
       agentId?: string;
       creatorAddress: string;
@@ -125,14 +119,13 @@ export class GrimoireClient {
   ): Promise<TaskResult> {
     return this.post("/api/quest", {
       prompt,
-      mode: opts.mode ?? "ask",
       bounty: opts.bounty ?? 0,
       agentId: opts.agentId ?? "auto",
       creatorAddress: opts.creatorAddress,
     });
   }
 
-  /** @deprecated Use createTask - skills run via orchestrator, not manually. */
+  /** @deprecated Use createTask */
   async createSkill(
     prompt: string,
     opts: { bounty?: number; agentId?: string; creator?: string } = {}
@@ -153,7 +146,8 @@ export class GrimoireClient {
   }
 
   async listSkills(): Promise<Skill[]> {
-    return (await this.getState()).skills;
+    const state = await this.getState();
+    return state.skills?.length ? state.skills : [];
   }
 
   async getState(walletAddress?: string): Promise<GrimoireState> {

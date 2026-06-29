@@ -59,7 +59,6 @@ export function modeLabel(_mode: TaskModeId): string {
   return "Working";
 }
 
-/** Vague build requests get clarifying questions first (Claude-style). */
 export function needsBuildClarification(prompt: string): boolean {
   const p = prompt.trim();
   if (

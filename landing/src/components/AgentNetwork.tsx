@@ -1,11 +1,5 @@
 "use client";
 
-/**
- * AgentNetwork - the living constellation in the hero.
- * A 3D graph of agent "heroes" (nodes) linked by glowing edges. Pulses of light
- * travel the edges = spells being cast / royalties flowing through the economy.
- */
-
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
@@ -79,7 +73,6 @@ function Graph() {
   useFrame((state, delta) => {
     const time = state.clock.elapsedTime;
     if (group.current) {
-      // continuous spin + easing toward the pointer for an interactive, alive feel
       const targetY = time * 0.06 + state.pointer.x * 0.5;
       const targetX = Math.sin(time * 0.18) * 0.12 - state.pointer.y * 0.3;
       group.current.rotation.y += (targetY - group.current.rotation.y) * 0.06;

@@ -1,6 +1,5 @@
 import type { MemoryKind } from "./types";
 
-/** Plain-language labels for memory UI (internal kinds stay technical in API). */
 export const MEMORY_KIND_LABEL: Record<MemoryKind, string> = {
   preference: "Preference",
   episodic: "Story / event",
