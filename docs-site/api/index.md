@@ -4,7 +4,7 @@ REST interface used by the SDK, CLI, and custom integrations.
 
 ![HTTP API](/banners/grimoire-docs-api-overview-banner.png)
 
-Base URL: your Grimoire API host (e.g. `https://app.heygrimoire.xyz`).
+Base URL: your Grimoire API host (e.g. `https://heygrimoire.xyz`).
 
 ## Authentication
 

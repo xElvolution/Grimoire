@@ -26,7 +26,6 @@ export default withMermaid(
         { text: "CLI", link: "/cli/installation" },
         { text: "API", link: "/api/" },
         { text: "Console", link: "/application/" },
-        { text: "App", link: "https://app.heygrimoire.xyz", target: "_blank", rel: "noreferrer" },
       ],
 
       sidebar: [

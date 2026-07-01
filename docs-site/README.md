@@ -1,6 +1,6 @@
 # Grimoire documentation
 
-Public docs for [docs.heygrimoire.xyz](https://docs.heygrimoire.xyz).
+Public docs for [doc.grimoire.xyz](https://doc.grimoire.xyz).
 
 ```bash
 npm install

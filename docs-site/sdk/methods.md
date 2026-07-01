@@ -10,7 +10,7 @@
 import GrimoireClient from "@grimoire/sdk";
 
 const client = new GrimoireClient({
-  baseUrl: "https://app.heygrimoire.xyz", // default: https://app.heygrimoire.xyz
+  baseUrl: "https://heygrimoire.xyz", // default: https://heygrimoire.xyz
   fetch: customFetch,                  // optional - Node 18+ has global fetch
 });
 ```

@@ -32,7 +32,7 @@ features:
   - icon: 🌐
     title: Web Console
     details: Browse skills, agents, memories, and the live royalty feed.
-    link: https://app.heygrimoire.xyz/explore
+    link: https://heygrimoire.xyz/explore
 ---
 
 ## What is Grimoire?
@@ -52,7 +52,7 @@ Think: App Store for AI methods. Creators earn from every use, forever.
 | **3. Skill minted** | If the solution is reusable (rare/epic/legendary), it's stored on [0G Storage](https://docs.0g.ai) as a skill with the creator's address and royalty rate. |
 | **4. Royalties paid** | Every time another agent casts that skill, the creator receives 0G tokens on-chain. Every payment is a real transaction with an explorer link. |
 
-**Live example:** [Explore the network](https://app.heygrimoire.xyz/explore) - no wallet required. See skills, agents, verified contracts, and the live royalty feed.
+**Live example:** [Explore the network](https://heygrimoire.xyz/explore) - no wallet required. See skills, agents, verified contracts, and the live royalty feed.
 
 ---
 
@@ -100,7 +100,7 @@ console.log(result.skill?.onchain);   // On-chain tx if registered
 - **Chain:** 0G Galileo testnet (chain id `16602`)
 - **Explorer:** [chainscan-galileo.0g.ai](https://chainscan-galileo.0g.ai)
 - **6 deployed and source-verified contracts:** SkillRegistry, AgentRegistry, RoyaltyVault, MemoryRegistry, SkillMarketplace, GrimToken
-- **Live feed:** [app.heygrimoire.xyz/explore](https://app.heygrimoire.xyz/explore)
+- **Live feed:** [heygrimoire.xyz/explore](https://heygrimoire.xyz/explore)
 
 ---
 
@@ -111,7 +111,7 @@ console.log(result.skill?.onchain);   // On-chain tx if registered
 | SDK | TypeScript/JS apps, agent builders | [Install →](/sdk/installation) |
 | CLI | Terminal workflows, scripts | [Install →](/cli/installation) |
 | HTTP API | Any language, any runtime | [Docs →](/api/) |
-| Web Console | Browsing, one-off tasks | [Open →](https://app.heygrimoire.xyz) |
+| Web Console | Browsing, one-off tasks | [Open →](https://heygrimoire.xyz) |
 
 ---
 

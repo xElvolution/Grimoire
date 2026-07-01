@@ -11,7 +11,7 @@ npm run dev      # http://localhost:5173
 npm run build    # → .vitepress/dist
 ```
 
-Deploy to **https://docs.heygrimoire.xyz** - see `docs-site/deployment/docs-site.md` or the [deployment guide](https://docs.heygrimoire.xyz/deployment/docs-site) once live.
+Deploy to **https://doc.grimoire.xyz** - see `docs-site/deployment/docs-site.md` or the [deployment guide](https://doc.grimoire.xyz/deployment/docs-site) once live.
 
 ## Deep-dive research (contributors)
 

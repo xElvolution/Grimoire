@@ -7,7 +7,7 @@ Get from zero to a working task in five minutes.
 ## 1. Prerequisites
 
 - Node.js 18+
-- Grimoire API URL (hosted or `https://app.heygrimoire.xyz`)
+- Grimoire API URL (hosted or `https://heygrimoire.xyz`)
 - Wallet address (`0x` + 40 hex)
 - Funded app credits ([credits guide](/concepts/credits))
 
@@ -30,7 +30,7 @@ cd sdk && npm install && npm run build
 import GrimoireClient from "@grimoire/sdk";
 
 const client = new GrimoireClient({
-  baseUrl: process.env.GRIMOIRE_URL ?? "https://app.heygrimoire.xyz",
+  baseUrl: process.env.GRIMOIRE_URL ?? "https://heygrimoire.xyz",
 });
 ```
 
@@ -108,7 +108,7 @@ console.log("Total earnings:", state.stats.totalEarnings);
 ## CLI equivalent
 
 ```bash
-export GRIMOIRE_URL=https://app.heygrimoire.xyz
+export GRIMOIRE_URL=https://heygrimoire.xyz
 grimoire credits --wallet 0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0
 grimoire task "Hello Grimoire" --wallet 0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0
 ```

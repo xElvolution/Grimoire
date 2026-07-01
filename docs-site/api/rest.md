@@ -4,7 +4,7 @@ Complete HTTP API reference for the Grimoire platform API (webapp server).
 
 ![All endpoints](/banners/grimoire-docs-api-rest-banner.png)
 
-Base URL: your deployment (e.g. `https://app.heygrimoire.xyz`).
+Base URL: your deployment (e.g. `https://heygrimoire.xyz` or `https://heygrimoire.xyz`).
 
 ---
 

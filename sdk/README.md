@@ -15,7 +15,7 @@ npm install @grimoire/sdk
 ```ts
 import { GrimoireClient } from "@grimoire/sdk";
 
-const grimoire = new GrimoireClient({ baseUrl: "https://app.heygrimoire.xyz" });
+const grimoire = new GrimoireClient({ baseUrl: "https://heygrimoire.xyz" });
 const wallet = "0xYourAddress";
 
 // Post any task - orchestrator routes, runs on 0G Compute, may mint a skill

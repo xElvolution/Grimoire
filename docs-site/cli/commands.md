@@ -8,10 +8,10 @@ Reference for the `grimoire` CLI - same API as the SDK, terminal-friendly output
 
 | Variable | Default | Description |
 | --- | --- | --- |
-| `GRIMOIRE_URL` | `https://app.heygrimoire.xyz` | Grimoire API base URL |
+| `GRIMOIRE_URL` | `https://heygrimoire.xyz` | Grimoire API base URL |
 
 ```bash
-export GRIMOIRE_URL=https://app.heygrimoire.xyz
+export GRIMOIRE_URL=https://heygrimoire.xyz
 ```
 
 ---
