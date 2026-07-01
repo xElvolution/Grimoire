@@ -103,7 +103,7 @@ export class GrimoireClient {
   private readonly _fetch: typeof fetch;
 
   constructor(config: GrimoireConfig = {}) {
-    this.baseUrl = (config.baseUrl ?? "https://heygrimoire.xyz").replace(/\/$/, "");
+    this.baseUrl = (config.baseUrl ?? "https://app.heygrimoire.xyz").replace(/\/$/, "");
     const f = config.fetch ?? globalThis.fetch;
     if (!f) throw new GrimoireError("No fetch - pass fetch in config.");
     this._fetch = f.bind(globalThis);
