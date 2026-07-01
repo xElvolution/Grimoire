@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import LogoMark from "./LogoMark";
+import { DOCS_URL } from "@/lib/links";
 
 const columns: { title: string; links: { label: string; href: string }[] }[] = [
   {
@@ -16,10 +17,10 @@ const columns: { title: string; links: { label: string; href: string }[] }[] = [
   {
     title: "Developers",
     links: [
-      { label: "SDK", href: "#" },
-      { label: "Documentation", href: "#" },
-      { label: "Smart contracts", href: "#" },
-      { label: "ERC-7857", href: "#" },
+      { label: "SDK", href: `${DOCS_URL}sdk/installation` },
+      { label: "Documentation", href: DOCS_URL },
+      { label: "Smart contracts", href: `${DOCS_URL}contracts/` },
+      { label: "ERC-7857", href: `${DOCS_URL}concepts/skills` },
     ],
   },
   {

@@ -1,4 +1,4 @@
-# Deploy doc.grimoire.xyz
+# Deploy docs.heygrimoire.xyz
 
 This site is built with VitePress from `docs-site/`.
 
@@ -22,12 +22,12 @@ Output: `.vitepress/dist/`
 
 ## Custom domain
 
-Add `doc.grimoire.xyz` in your host’s domain settings.
+Add `docs.heygrimoire.xyz` in your host's domain settings.
 
 Example DNS:
 
 ```
-CNAME doc.grimoire.xyz → cname.vercel-dns.com
+CNAME docs.heygrimoire.xyz → cname.vercel-dns.com
 ```
 
 ## Cloudflare Pages

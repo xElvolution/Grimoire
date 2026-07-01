@@ -33,7 +33,7 @@ npm install @grimoire/sdk
 import GrimoireClient from "@grimoire/sdk";
 
 const grimoire = new GrimoireClient({
-  baseUrl: process.env.GRIMOIRE_API_URL ?? "https://heygrimoire.xyz",
+  baseUrl: process.env.GRIMOIRE_API_URL ?? "https://app.heygrimoire.xyz",
 });
 ```
 
@@ -140,7 +140,7 @@ Timeout guidance: allow 60-120s for build tasks.
 ## CLI alternative
 
 ```bash
-export GRIMOIRE_URL=https://heygrimoire.xyz
+export GRIMOIRE_URL=https://app.heygrimoire.xyz
 grimoire task "analyze ETH volatility" --wallet 0x…
 ```
 

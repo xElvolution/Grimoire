@@ -38,7 +38,7 @@ grimoire help
 | `GRIMOIRE_URL` | API base URL |
 
 ```bash
-export GRIMOIRE_URL=https://heygrimoire.xyz
+export GRIMOIRE_URL=https://app.heygrimoire.xyz
 ```
 
 ## Requirements

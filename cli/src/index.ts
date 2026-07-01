@@ -2,7 +2,7 @@
 
 import GrimoireClient from "@grimoire/sdk";
 
-const baseUrl = process.env.GRIMOIRE_URL || "https://heygrimoire.xyz";
+const baseUrl = process.env.GRIMOIRE_URL || "https://app.heygrimoire.xyz";
 const client = new GrimoireClient({ baseUrl });
 
 function arg(name: string): string | undefined {
@@ -23,7 +23,7 @@ Grimoire CLI
   grimoire skills
   grimoire brain
 
-Env: GRIMOIRE_URL (default https://heygrimoire.xyz)
+Env: GRIMOIRE_URL (default https://app.heygrimoire.xyz)
 Fund app credits before posting tasks.
 `);
     return;

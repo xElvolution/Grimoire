@@ -15,7 +15,7 @@ See [Installation](/cli/installation).
 ## Environment
 
 ```bash
-export GRIMOIRE_URL=https://heygrimoire.xyz
+export GRIMOIRE_URL=https://app.heygrimoire.xyz
 ```
 
 ## Example

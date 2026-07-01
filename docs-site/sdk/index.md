@@ -18,7 +18,7 @@ See [Installation](/sdk/installation) for monorepo and local linking.
 import { GrimoireClient } from "@grimoire/sdk";
 
 const client = new GrimoireClient({
-  baseUrl: "https://heygrimoire.xyz",
+  baseUrl: "https://app.heygrimoire.xyz",
 });
 ```
 

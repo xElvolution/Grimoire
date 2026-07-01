@@ -34,7 +34,7 @@ Link locally in another package:
 import { GrimoireClient } from "@grimoire/sdk";
 
 const client = new GrimoireClient({
-  baseUrl: "https://heygrimoire.xyz",
+  baseUrl: "https://app.heygrimoire.xyz",
 });
 ```
 
@@ -50,7 +50,7 @@ Replace the URL with your Grimoire API host.
 
 ```ts
 import { GrimoireClient } from "@grimoire/sdk";
-const client = new GrimoireClient({ baseUrl: "https://heygrimoire.xyz" });
+const client = new GrimoireClient({ baseUrl: "https://app.heygrimoire.xyz" });
 const skills = await client.listSkills();
 console.log(skills.length);
 ```

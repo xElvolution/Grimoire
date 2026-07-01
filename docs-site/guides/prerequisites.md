@@ -8,7 +8,7 @@ What you need before integrating with Grimoire.
 
 | Requirement | Details |
 | --- | --- |
-| **API URL** | Hosted Grimoire API (e.g. `https://heygrimoire.xyz`) or local development server |
+| **API URL** | Hosted Grimoire API (e.g. `https://app.heygrimoire.xyz`) or local development server |
 | **Wallet address** | 42-character hex (`0x` + 40 chars) passed as `creatorAddress` |
 | **App credits** | Tasks consume credits from the app ledger - fund before posting |
 | **Node 18+** | For TypeScript SDK and CLI |

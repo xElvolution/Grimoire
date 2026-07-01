@@ -4,7 +4,7 @@ The Grimoire **Console** is the signed-in web application. It uses the same HTTP
 
 ![Console](/banners/grimoire-docs-console-banner.png)
 
-Production URL: your deployment (e.g. `https://app.grimoire.xyz`).
+Production URL: [app.heygrimoire.xyz](https://app.heygrimoire.xyz).
 
 ## Routes
 
@@ -81,7 +81,7 @@ The Console is useful for:
 cd webapp
 npm install
 npm run dev
-# https://heygrimoire.xyz
+# https://app.heygrimoire.xyz
 ```
 
 Requires API server with 0G Compute and Storage configured.

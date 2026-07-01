@@ -216,7 +216,7 @@ A monorepo with four packages:
 
 ```
 0G-agent/
-├── docs-site/            VitePress docs → doc.grimoire.xyz
+├── docs-site/            VitePress docs → docs.heygrimoire.xyz
 ├── docs/
 │   └── engram/           BUILD.md, WHY.md, neuroscience, diagrams, neuron guide
 ├── landing/              Marketing site - Next.js 16, Three.js hero, GSAP, Framer Motion
@@ -226,7 +226,9 @@ A monorepo with four packages:
 └── contracts/            SkillRegistry, AgentRegistry, MemoryRegistry, RoyaltyVault, …
 ```
 
-**Documentation:** https://doc.grimoire.xyz (or `cd docs-site && npm run dev`)
+**Documentation:** https://docs.heygrimoire.xyz (or `cd docs-site && npm run dev`)
+
+**Live:** [app.heygrimoire.xyz](https://app.heygrimoire.xyz) · [docs.heygrimoire.xyz](https://docs.heygrimoire.xyz)
 
 ## Tech stack
 
